@@ -6,4 +6,7 @@ describe Answer do
 
   it { should respond_to(:content) }
   it { should respond_to(:question_id) }
+
+  it { should validate_presence_of :content }
+  it { should validate_presence_of :question_id }
 end
