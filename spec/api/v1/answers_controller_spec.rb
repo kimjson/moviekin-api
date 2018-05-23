@@ -16,16 +16,13 @@ RSpec.describe Api::V1::AnswersController, type: :request do
   end
   describe "GET #index" do
     before(:each) do
-      @answers = []
-      (1...4).each do |n|
-        @answers << FactoryBot.create :answer
-      end
+      4.times { FactoryBot.create :answer }
       get "/answers"
     end
 
     it "returns 4 records from the database" do
       answers_response = JSON.parse(response.body)
-      expect(answers_response[:answers]).to have(4).items
+      expect(answers_response.size).to eq(4)
     end
 
     it { expect(response).to have_http_status(200) }

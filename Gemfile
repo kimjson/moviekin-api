@@ -40,6 +40,8 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
+gem 'swagger-blocks'
+
 group :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
