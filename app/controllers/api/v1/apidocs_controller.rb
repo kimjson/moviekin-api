@@ -33,6 +33,7 @@ class Api::V1::ApidocsController < ApplicationController
   SWAGGERED_CLASSES = [
     Api::V1::AnswersController,
     Answer,
+    ErrorModel,
     self,
   ].freeze
 

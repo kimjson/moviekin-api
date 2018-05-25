@@ -9,7 +9,7 @@ Rails.application.routes.draw do
       # We are going to list our resources here
       resources :answers, :only => [:show, :index]
       resources :apidocs, :only => [:index]
-      get '/docs', to: redirect('/swagger-ui-dist/index.html')
+      get '/docs', to: redirect('/assets/swagger-ui-dist/index.html?url=/apidocs')
       resources :questions
     end
   end
