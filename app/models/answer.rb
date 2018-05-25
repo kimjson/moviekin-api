@@ -16,6 +16,20 @@ class Answer < ApplicationRecord
     end
   end
 
+  swagger_schema :AnswerInput do
+    allOf do
+      schema do
+        key :'$ref', :Answer
+      end
+      schema do
+        key :required, [:content, :question_id]
+        property :content do
+          key :type, :string
+        end
+      end
+    end
+  end
+
   validates :content, :question_id, presence: true
   belongs_to :question
 end

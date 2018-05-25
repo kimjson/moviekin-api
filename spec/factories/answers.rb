@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :answer do
-    content { FFaker::Lorem.sentences }
+    content { FFaker::Lorem.paragraph }
     question
   end
 end
