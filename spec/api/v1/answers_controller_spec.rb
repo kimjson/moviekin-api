@@ -7,17 +7,39 @@ end
 
 RSpec.describe Api::V1::AnswersController, type: :request do
   describe "GET #show" do
-    before(:each) do
-      @answer = FactoryBot.create :answer
-      get "/answers/#{@answer.id}"
+
+    context 'when the record exists' do
+      before(:each) do
+        @answer = FactoryBot.create :answer
+        get "/answers/#{@answer.id}"
+      end
+
+      it 'returns the answer' do
+        answer_response = json_response
+        expect(answer_response).not_to be_empty
+        expect(answer_response[:id]).to eq(@answer.id)
+        expect(answer_response[:content]).to eql @answer.content
+      end
+
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
+      end
     end
 
-    it "returns the information about the record" do
-      answer_response = json_response
-      expect(answer_response[:content]).to eql @answer.content
-    end
+    context 'when the record does not exist' do
 
-    it { expect(response).to have_http_status(200) }
+      before(:each) do
+        get "/answers/100"
+      end
+
+      it 'returns status code 404' do
+        expect(response).to have_http_status(404)
+      end
+
+      it 'returns a not found message' do
+        expect(response.body).to match(/Couldn't find Answer/)
+      end
+    end
   end
 
   describe "GET #index" do
@@ -59,13 +81,13 @@ RSpec.describe Api::V1::AnswersController, type: :request do
 
       it "renders an errors json" do
         answer_response = json_response
-        expect(answer_response).to have_key(:errors)
+        expect(answer_response).to have_key(:message)
       end
 
       it "renders the json errors on why the answer could not be created" do
         answer_response = json_response
         Rails.logger.debug "answer_response: #{answer_response}"
-        expect(answer_response[:errors][:content]).to include "can't be blank"
+        expect(answer_response[:message]).to include "can't be blank"
       end
 
       it { expect(response).to have_http_status(422) }

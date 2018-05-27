@@ -27,14 +27,21 @@ class Api::V1::ApidocsController < ApplicationController
     key :basePath, ''
     key :consumes, ['application/json']
     key :produces, ['application/json']
+    parameter :answer_id do
+      key :name, :id
+      key :in, :path
+      key :description, 'ID of answer to fetch'
+      key :required, true
+      key :type, :integer
+      key :format, :int64
+    end
   end
 
   # A list of all classes that have swagger_* declarations.
   SWAGGERED_CLASSES = [
-    Api::V1::AnswersController,
-    Answer,
-    ErrorModel,
     self,
+    SwaggerPath,
+    SwaggerSchema,
   ].freeze
 
   def index
