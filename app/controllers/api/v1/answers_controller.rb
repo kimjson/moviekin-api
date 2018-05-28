@@ -13,6 +13,17 @@ class Api::V1::AnswersController < ApplicationController
     render json: answer, status: 201, location: [:api, answer]
   end
 
+  def update
+    answer = Answer.find(params[:id])
+    answer.update!(answer_params)
+    render json: answer, status: 200, location: [:api, answer]
+  end
+
+  def destroy
+    Answer.find(params[:id]).destroy!
+    head 204
+  end
+
   private
 
   def answer_params

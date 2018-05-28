@@ -86,11 +86,56 @@ RSpec.describe Api::V1::AnswersController, type: :request do
 
       it "renders the json errors on why the answer could not be created" do
         answer_response = json_response
-        Rails.logger.debug "answer_response: #{answer_response}"
         expect(answer_response[:message]).to include "can't be blank"
       end
 
       it { expect(response).to have_http_status(422) }
     end
+  end
+  
+  describe "PUT/PATCH #update" do
+    before(:each) do
+      @answer = FactoryBot.create :answer
+    end
+
+    context "when is successfully updated" do
+      before(:each) do
+        patch "/answers/#{@answer.id}",
+              params: { answer: { content: "Updated content" } }
+      end
+      
+      it "renders the json for the updated answer" do
+        answer_response = json_response
+        expect(answer_response[:content]).to eql "Updated content"
+      end
+
+      it { expect(response).to have_http_status(200) }
+    end
+    
+    context "when is not updated" do
+      before(:each) do
+        patch "/answers/#{@answer.id}",
+              params: { answer: { content: nil } }
+      end
+
+      it "renders an errors json" do
+        expect(json_response).to have_key(:message)
+      end
+
+      it "renders the error message on why the answer could not be updated" do
+        expect(json_response[:message]).to include "can't be blank"
+      end
+
+      it { expect(response).to have_http_status(422) }
+    end
+  end
+  describe "DELETE #destroy" do
+    before(:each) do
+      @answer = FactoryBot.create :answer
+      delete "/answers/#{@answer.id}"
+    end
+
+    it { expect(response).to have_http_status(204) }
+    
   end
 end
