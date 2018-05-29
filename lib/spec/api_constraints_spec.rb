@@ -9,12 +9,12 @@ describe ApiConstraints do
     it "returns true when the version matches the 'Accept' header" do
       request = double(host: 'localhost:3000',
                        headers: {"Accept" => "application/vnd.moviekin.v1"})
-      api_constraints_v1.matches?(request).should be_truthy
+      expect(api_constraints_v1.matches?(request)).to be_truthy
     end
 
     it "returns the default version when 'default' option is specified" do
       request = double(host: 'localhost:3000')
-      api_constraints_v2.matches?(request).should be_truthy
+      expect(api_constraints_v2.matches?(request)).to be_truthy
     end
   end
 end
