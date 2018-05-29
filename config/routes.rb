@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       resources :questions, :only => [:show, :index, :create, :update, :destroy] do
         resources :answers, :only => [:create]
       end
+      resources :movies, :only => [:show, :index, :create, :update, :destroy]
       resources :answers, :only => [:show, :index, :update, :destroy]
       resources :apidocs, :only => [:index]
       get '/docs', to: redirect('/assets/swagger-ui-dist/index.html?url=/apidocs')

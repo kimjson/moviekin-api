@@ -17,7 +17,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       it 'returns the question' do
         question_response = json_response
         expect(question_response).not_to be_empty
-        expect(question_response[:id]).to eq(@question.id)
+        expect(question_response[:id]).to eql @question.id
         expect(question_response[:title]).to eql @question.title
         expect(question_response[:content]).to eql @question.content
       end
@@ -45,7 +45,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
 
   describe "GET #index" do
     before(:each) do
-      4.times { FactoryBot.create :answer }
+      4.times { FactoryBot.create :question }
       get "/questions"
     end
 
@@ -66,7 +66,6 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
 
       it "renders the json representation for the answer record just created" do
         question_response = json_response
-        Rails.logger.debug "response: #{question_response}"
         expect(question_response[:title]).to eql @question_attributes[:title]
         expect(question_response[:content]).to eql @question_attributes[:content]
       end
