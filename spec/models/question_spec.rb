@@ -6,10 +6,13 @@ describe Question do
 
   it { is_expected.to respond_to(:title) }
   it { is_expected.to respond_to(:content) }
+  it { is_expected.to respond_to(:movie_id) }
 
   it { is_expected.to validate_presence_of :title }
   it { is_expected.to validate_presence_of :content }
+  it { is_expected.to validate_presence_of :movie_id }
 
+  it { is_expected.to belong_to :movie }
   it { is_expected.to have_many(:answers) }
 
   describe "#answers association" do

@@ -10,7 +10,7 @@ class Api::V1::QuestionsController < ApplicationController
   end
   
   def create
-    question = Question.create!(question_params)
+    question = Movie.find(params[:movie_id]).questions.create!(question_params)
     render json: question, status: 201, location: [:api, question]
   end
 

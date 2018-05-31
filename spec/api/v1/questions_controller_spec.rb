@@ -60,12 +60,14 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
   describe "POST #create" do
     context "when is successfully created" do
       before(:each) do
+        movie = FactoryBot.create :movie
         @question_attributes = FactoryBot.attributes_for :question
-        post "/questions", params: { question: @question_attributes }
+        post "/movies/#{movie.id}/questions", params: { question: @question_attributes }
       end
 
       it "renders the json representation for the answer record just created" do
         question_response = json_response
+        Rails.logger.debug "response: #{json_response}"
         expect(question_response[:title]).to eql @question_attributes[:title]
         expect(question_response[:content]).to eql @question_attributes[:content]
       end
@@ -76,9 +78,9 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
     # TODO: add more test case (invalid field case)
     context "when is not created" do
       before(:each) do
-        question = FactoryBot.create :question
+        movie = FactoryBot.create :movie
         @invalid_question_attributes = { content: nil }
-        post "/questions", params: { question: @invalid_question_attributes }
+        post "/movies/#{movie.id}/questions", params: { question: @invalid_question_attributes }
       end
 
       it "renders an errors json" do

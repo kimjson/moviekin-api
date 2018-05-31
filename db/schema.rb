@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_29_135205) do
+ActiveRecord::Schema.define(version: 2018_05_31_140146) do
 
   create_table "answers", force: :cascade do |t|
     t.text "content", default: ""
@@ -35,6 +35,8 @@ ActiveRecord::Schema.define(version: 2018_05_29_135205) do
     t.text "content", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "movie_id"
+    t.index ["movie_id"], name: "index_questions_on_movie_id"
   end
 
 end
