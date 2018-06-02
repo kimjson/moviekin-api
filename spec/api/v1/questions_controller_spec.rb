@@ -67,7 +67,6 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
 
       it "renders the json representation for the answer record just created" do
         question_response = json_response
-        Rails.logger.debug "response: #{json_response}"
         expect(question_response[:title]).to eql @question_attributes[:title]
         expect(question_response[:content]).to eql @question_attributes[:content]
       end

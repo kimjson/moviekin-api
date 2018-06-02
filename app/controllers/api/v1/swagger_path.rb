@@ -9,6 +9,73 @@ class Api::V1::SwaggerPath
       key :tags, [
         'answer'
       ]
+      key :produces, [
+        'application/json'
+      ]
+      parameter :answer_id
+      response 200 do
+        key :description, 'answer response'
+        schema do
+          key :'$ref', :Answer
+        end
+      end
+      response 404 do
+        key :description, 'answer not found'
+        schema do
+          key :'$ref', :ErrorModel
+        end
+      end
+      response :default do
+        key :description, 'unexpected error'
+        schema do
+          key :'$ref', :ErrorModel
+        end
+      end
+    end
+
+    operation :delete do
+      key :description, 'Deletes a single answer'
+      key :operationId, 'deleteAnswer'
+      key :tags, [
+        'answer'
+      ]
+      parameter :answer_id
+      response 204 do
+        key :description, 'answer deleted'
+      end
+      response 404 do
+        key :description, 'answer not found'
+        schema do
+          key :'$ref', :ErrorModel
+        end
+      end
+      response :default do
+        key :description, 'unexpected error'
+        schema do
+          key :'$ref', :ErrorModel
+        end
+      end
+    end
+
+    operation :patch do
+      key :summary, 'Update an Answer'
+      key :description, 'Updates a single answer'
+      key :operationId, 'updateAnswer'
+      key :produces, [
+        'application/json'
+      ]
+      key :tags, [
+        'answer'
+      ]
+      parameter do
+        key :name, :answer
+        key :in, :body
+        key :required, true
+        schema do
+          key :'$ref', :AnswerInput
+        end
+      end
+
       parameter :answer_id
       response 200 do
         key :description, 'answer response'

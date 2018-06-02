@@ -69,7 +69,6 @@ RSpec.describe Api::V1::MoviesController, type: :request do
 
       it "renders the json representation for the movie record just created" do
         movie_response = json_response
-        Rails.logger.debug "response: #{movie_response}"
 
         expect(movie_response).not_to be_empty
         expect(movie_response[:name]).to eql @movie_attributes[:name]
