@@ -15,11 +15,12 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       end
 
       it 'returns the question' do
-        question_response = json_response
+        question_response = json_response[:data]
+        Rails.logger.debug "question_response: #{question_response}"
         expect(question_response).not_to be_empty
-        expect(question_response[:id]).to eql @question.id
-        expect(question_response[:title]).to eql @question.title
-        expect(question_response[:content]).to eql @question.content
+        expect(question_response[:id]).to eql @question.id.to_s
+        expect(question_response[:attributes][:title]).to eql @question.title
+        expect(question_response[:attributes][:content]).to eql @question.content
       end
 
       it 'returns status code 200' do
@@ -50,7 +51,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
     end
 
     it "returns 4 records from the database" do
-      questions_response = json_response
+      questions_response = json_response[:data]
       expect(questions_response.size).to eq(4)
     end
 
@@ -66,9 +67,9 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       end
 
       it "renders the json representation for the answer record just created" do
-        question_response = json_response
-        expect(question_response[:title]).to eql @question_attributes[:title]
-        expect(question_response[:content]).to eql @question_attributes[:content]
+        question_response = json_response[:data]
+        expect(question_response[:attributes][:title]).to eql @question_attributes[:title]
+        expect(question_response[:attributes][:content]).to eql @question_attributes[:content]
       end
 
       it { expect(response).to have_http_status(201) }
@@ -108,9 +109,9 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       end
       
       it "renders the json for the updated answer" do
-        question_response = json_response
-        expect(question_response[:content]).to eql "Updated content"
-        expect(question_response[:title]).to eql "Updated title"
+        question_response = json_response[:data]
+        expect(question_response[:attributes][:content]).to eql "Updated content"
+        expect(question_response[:attributes][:title]).to eql "Updated title"
       end
 
       it { expect(response).to have_http_status(200) }

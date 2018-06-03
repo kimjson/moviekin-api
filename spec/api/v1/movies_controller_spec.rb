@@ -75,11 +75,11 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         Rails.logger.debug "movie_response: #{movie_response}"
 
         expect(movie_response).not_to be_empty
-        expect(movie_response[:attributes][:name]).to eql @movie.name
-        expect(movie_response[:attributes][:code]).to eql @movie.code
-        expect(movie_response[:attributes][:director]).to eql @movie.director
-        expect(movie_response[:attributes][:open_year]).to eql @movie.open_year
-        expect(movie_response[:attributes][:production_year]).to eql @movie.production_year
+        expect(movie_response[:attributes][:name]).to eql @movie_attributes[:name]
+        expect(movie_response[:attributes][:code]).to eql @movie_attributes[:code]
+        expect(movie_response[:attributes][:director]).to eql @movie_attributes[:director]
+        expect(movie_response[:attributes][:open_year]).to eql @movie_attributes[:open_year]
+        expect(movie_response[:attributes][:production_year]).to eql @movie_attributes[:production_year]
       end
 
       it { expect(response).to have_http_status(201) }

@@ -15,10 +15,10 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
 
       it 'returns the answer' do
-        answer_response = json_response
+        answer_response = json_response[:data]
         expect(answer_response).not_to be_empty
-        expect(answer_response[:id]).to eq(@answer.id)
-        expect(answer_response[:content]).to eql @answer.content
+        expect(answer_response[:id]).to eq(@answer.id.to_s)
+        expect(answer_response[:attributes][:content]).to eql @answer.content
       end
 
       it 'returns status code 200' do
@@ -49,7 +49,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
     end
 
     it "returns 4 records from the database" do
-      answers_response = json_response
+      answers_response = json_response[:data]
       expect(answers_response.size).to eq(4)
     end
 
@@ -65,8 +65,8 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
 
       it "renders the json representation for the answer record just created" do
-        answer_response = json_response
-        expect(answer_response[:content]).to eql @answer_attributes[:content]
+        answer_response = json_response[:data]
+        expect(answer_response[:attributes][:content]).to eql @answer_attributes[:content]
       end
 
       it { expect(response).to have_http_status(201) }
@@ -105,8 +105,8 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
       
       it "renders the json for the updated answer" do
-        answer_response = json_response
-        expect(answer_response[:content]).to eql "Updated content"
+        answer_response = json_response[:data]
+        expect(answer_response[:attributes][:content]).to eql "Updated content"
       end
 
       it { expect(response).to have_http_status(200) }
