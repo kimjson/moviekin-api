@@ -14,9 +14,7 @@ RSpec.describe Movie, type: :model do
   it { is_expected.to validate_presence_of :code }
   it { is_expected.to validate_presence_of :director }
   it { is_expected.to validate_numericality_of(:open_year).is_greater_than_or_equal_to(1896) }
-  it { is_expected.to validate_presence_of :open_year }
   it { is_expected.to validate_numericality_of(:production_year).is_greater_than_or_equal_to(1896) }
-  it { is_expected.to validate_presence_of :production_year }
 
   it { is_expected.to have_many(:questions) }
 

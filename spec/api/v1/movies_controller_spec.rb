@@ -11,18 +11,19 @@ RSpec.describe Api::V1::MoviesController, type: :request do
     context 'when the record exists' do
       before(:each) do
         @movie = FactoryBot.create :movie
+        3.times { FactoryBot.create :question, movie: @movie }
         get "/movies/#{@movie.id}"
       end
 
       it 'returns the movie' do
-        movie_response = json_response
+        movie_response = json_response[:data]
         expect(movie_response).not_to be_empty
-        expect(movie_response[:id]).to eql @movie.id
-        expect(movie_response[:name]).to eql @movie.name
-        expect(movie_response[:code]).to eql @movie.code
-        expect(movie_response[:director]).to eql @movie.director
-        expect(movie_response[:open_year]).to eql @movie.open_year
-        expect(movie_response[:production_year]).to eql @movie.production_year
+        expect(movie_response[:id]).to eql @movie.id.to_s
+        expect(movie_response[:attributes][:name]).to eql @movie.name
+        expect(movie_response[:attributes][:code]).to eql @movie.code
+        expect(movie_response[:attributes][:director]).to eql @movie.director
+        expect(movie_response[:attributes][:open_year]).to eql @movie.open_year
+        expect(movie_response[:attributes][:production_year]).to eql @movie.production_year
       end
 
       it 'returns status code 200' do
@@ -53,7 +54,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
     end
 
     it "returns 4 records from the database" do
-      movies_response = json_response
+      movies_response = json_response[:data]
       expect(movies_response.size).to eq(4)
     end
 
@@ -64,19 +65,21 @@ RSpec.describe Api::V1::MoviesController, type: :request do
     context "when is successfully created" do
       before(:each) do
         @movie_attributes = FactoryBot.attributes_for :movie
+        Rails.logger.debug "movie_attributes: #{@movie_attributes}"
         post "/movies", params: { movie: @movie_attributes }
       end
 
       it "renders the json representation for the movie record just created" do
-        movie_response = json_response
+        movie_response = json_response[:data]
+
+        Rails.logger.debug "movie_response: #{movie_response}"
 
         expect(movie_response).not_to be_empty
-        expect(movie_response[:name]).to eql @movie_attributes[:name]
-        expect(movie_response[:code]).to eql @movie_attributes[:code]
-        expect(movie_response[:director]).to eql @movie_attributes[:director]
-        expect(movie_response[:open_year]).to eql @movie_attributes[:open_year]
-        expect(movie_response[:production_year]).to eql @movie_attributes[:production_year]
-
+        expect(movie_response[:attributes][:name]).to eql @movie.name
+        expect(movie_response[:attributes][:code]).to eql @movie.code
+        expect(movie_response[:attributes][:director]).to eql @movie.director
+        expect(movie_response[:attributes][:open_year]).to eql @movie.open_year
+        expect(movie_response[:attributes][:production_year]).to eql @movie.production_year
       end
 
       it { expect(response).to have_http_status(201) }
@@ -116,12 +119,12 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       end
       
       it "renders the json for the updated movie" do
-        movie_response = json_response
+        movie_response = json_response[:data]
 
         expect(movie_response).not_to be_empty
-        expect(movie_response[:id]).to eql @movie.id
-        expect(movie_response[:name]).to eql "Updated name"
-        expect(movie_response[:code]).to eql "Updated code"
+        expect(movie_response[:id]).to eql @movie.id.to_s
+        expect(movie_response[:attributes][:name]).to eql "Updated name"
+        expect(movie_response[:attributes][:code]).to eql "Updated code"
 
       end
 
