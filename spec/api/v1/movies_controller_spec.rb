@@ -65,14 +65,12 @@ RSpec.describe Api::V1::MoviesController, type: :request do
     context "when is successfully created" do
       before(:each) do
         @movie_attributes = FactoryBot.attributes_for :movie
-        Rails.logger.debug "movie_attributes: #{@movie_attributes}"
         post "/movies", params: { movie: @movie_attributes }
       end
 
       it "renders the json representation for the movie record just created" do
         movie_response = json_response[:data]
 
-        Rails.logger.debug "movie_response: #{movie_response}"
 
         expect(movie_response).not_to be_empty
         expect(movie_response[:attributes][:name]).to eql @movie_attributes[:name]

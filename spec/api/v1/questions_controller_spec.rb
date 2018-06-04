@@ -16,7 +16,6 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
 
       it 'returns the question' do
         question_response = json_response[:data]
-        Rails.logger.debug "question_response: #{question_response}"
         expect(question_response).not_to be_empty
         expect(question_response[:id]).to eql @question.id.to_s
         expect(question_response[:attributes][:title]).to eql @question.title
