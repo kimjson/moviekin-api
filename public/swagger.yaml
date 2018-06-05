@@ -1,0 +1,554 @@
+swagger: '2.0'
+info:
+  description: |
+    REST API backend (in Ruby on Rails) of MovieKin, a stackoverflow clone service for cinema audiences.
+  version: 1.0.0
+  title: Moviekin API
+  contact:
+    email: wotjd1102@gmail.com
+  license:
+    name: AGPL-3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html
+tags:
+- name: movie
+  description: Answers operations
+- name: question
+  description: Questions operations
+- name: answer
+  description: Answers operations
+paths:
+  /movies:
+    get:
+      tags:
+      - movie
+      summary: Returns all movies
+      operationId: allMovies
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: movie response
+          schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: "#/definitions/Movie"
+    post:
+      tags:
+      - movie
+      summary: Add a new movie
+      operationId: "addMovie"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "data"
+        description: "Movie object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/Movie"
+      responses:
+        422:
+          description: "Invalid input"
+  /movies/{id}:
+    get:
+      tags:
+      - "movie"
+      summary: "Find movie by ID"
+      description: "Returns a single movie"
+      operationId: "findMovieById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of movie to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "movie operation"
+          schema:
+            $ref: "#/definitions/Movie"
+        404:
+          description: "Movie not found"
+    patch:
+      tags:
+        - "movie"
+      summary: "Update an existing movie"
+      operationId: "updateMovie"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of movie to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "data"
+        description: "Movie object part that needs to be changed"
+        required: true
+        schema:
+          $ref: "#/definitions/Movie"
+      responses:
+        200:
+          description: "movie updated"
+          schema:
+            $ref: "#/definitions/Movie"
+        404:
+          description: "Movie not found"
+    delete:
+      tags:
+      - "movie"
+      summary: "Deletes a movie"
+      operationId: "deleteMovie"
+      produces: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Movie id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        204:
+          description: "movie deleted"
+        404:
+          description: "Movie not found"
+  /questions:
+    get:
+      tags:
+      - question
+      summary: Returns all questions
+      operationId: allQuestions
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: questions response
+          schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: "#/definitions/Question"
+  /questions/{id}:
+    get:
+      tags:
+      - question
+      summary: "Find question by ID"
+      description: "Returns a single question"
+      operationId: "findQuestionById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of question to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "question operation"
+          schema:
+            $ref: "#/definitions/Question"
+        404:
+          description: "Question not found"
+    patch:
+      tags:
+        - question
+      summary: "Update an existing question"
+      operationId: "updateQuestion"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of question to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "data"
+        description: "Question object part that needs to be changed"
+        required: true
+        schema:
+          $ref: "#/definitions/Question"
+      responses:
+        200:
+          description: "question updated"
+          schema:
+            $ref: "#/definitions/Question"
+        404:
+          description: "Question not found"
+    delete:
+      tags:
+      - question
+      summary: "Deletes a question"
+      operationId: "deleteQuestion"
+      produces: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Question id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        204:
+          description: "question deleted"
+        404:
+          description: "Question not found"
+  /movies/{id}/questions:
+    post:
+      tags:
+        - question
+      summary: "Add a question to the movie"
+      operationId: "addMovieToQuestion"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of movie to add question to"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "data"
+        description: "Question object part that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/Question"
+      responses:
+        201:
+          description: "question added"
+          schema:
+            $ref: "#/definitions/Question"
+        404:
+          description: "Movie not found"
+        422:
+          description: "Invalid input"
+  /answers:
+    get:
+      tags:
+      - answer
+      summary: Returns all answers
+      operationId: allAnswers
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: answers response
+          schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: "#/definitions/Answer"
+  /answers/{id}:
+    get:
+      tags:
+      - answer
+      summary: "Find answer by ID"
+      description: "Returns a single answer"
+      operationId: "findAnswerById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of answer to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "answer operation"
+          schema:
+            $ref: "#/definitions/Answer"
+        404:
+          description: "Answer not found"
+    patch:
+      tags:
+        - answer
+      summary: "Update an existing answer"
+      operationId: "updateAnswer"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of answer to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "data"
+        description: "Answer object part that needs to be changed"
+        required: true
+        schema:
+          $ref: "#/definitions/Answer"
+      responses:
+        200:
+          description: "answer updated"
+          schema:
+            $ref: "#/definitions/Answer"
+        404:
+          description: "Answer not found"
+    delete:
+      tags:
+      - answer
+      summary: "Deletes a answer"
+      operationId: "deleteAnswer"
+      produces: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Answer id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        204:
+          description: "answer deleted"
+        404:
+          description: "Answer not found"
+  /questions/{id}/answers:
+    post:
+      tags:
+        - answer
+      summary: "Add an answer to the question"
+      operationId: "addAnswerToQuestion"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of question to add answer to"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "data"
+        description: "Answer object that needs to be added to the Question"
+        required: true
+        schema:
+          $ref: "#/definitions/Answer"
+      responses:
+        201:
+          description: "answer added to the question"
+          schema:
+            $ref: "#/definitions/Answer"
+        404:
+          description: "Question not found"
+        422:
+          description: "Invalid input"
+  
+    
+definitions:
+  Movie:
+    type: object
+    required:
+    - id
+    - type
+    - attributes
+    - relationships
+    properties:
+      id:
+        type: string
+        pattern: '\d+'
+      type:
+        type: string
+        pattern: '^movie$'
+      attributes:
+        type: object
+        required:
+        - name
+        - code
+        - open_year
+        - production_year
+        properties:
+          name:
+            type: string
+          code:
+            type: string
+            pattern: '\d{8}'
+          open_year:
+            type: integer
+          production_year:
+            type: integer
+      relationships:
+        type: object
+        required:
+        - questions
+        properties:
+          questions:
+            type: object
+            required:
+            - data
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - type
+                  properties:
+                    id:
+                      type: string
+                      pattern: '\d+'
+                    type:
+                      type: string
+                      pattern: '^question$'
+  Question:
+    type: object
+    required:
+    - id
+    - type
+    - attributes
+    - relationships
+    properties:
+      id:
+        type: string
+        pattern: '\d+'
+      type:
+        type: string
+        pattern: '^movie$'
+      attributes:
+        type: object
+        required:
+        - title
+        - content
+        - movie_id
+        properties:
+          title:
+            type: string
+          content:
+            type: string
+            pattern: '\d{8}'
+          movie_id:
+            type: integer
+            format: int64
+      relationships:
+        type: object
+        required:
+        - answers
+        - movie
+        properties:
+          answers:
+            type: object
+            required:
+            - data
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - type
+                  properties:
+                    id:
+                      type: string
+                      pattern: '\d+'
+                    type:
+                      type: string
+                      pattern: '^answer$'
+          movie:
+            type: object
+            required:
+            - data
+            properties:
+              data:
+                type: object
+                required:
+                - id
+                - type
+                properties:
+                  id:
+                    type: string
+                    pattern: '\d+'
+                  type:
+                    type: string
+                    pattern: '^movie$'
+  Answer:
+    type: object
+    required:
+    - id
+    - type
+    - attributes
+    - relationships
+    properties:
+      id:
+        type: string
+        pattern: '\d+'
+      type:
+        type: string
+        pattern: '^movie$'
+      attributes:
+        type: object
+        required:
+        - content
+        - question_id
+        properties:
+          content:
+            type: string
+          question_id:
+            type: integer
+            format: int64
+      relationships:
+        type: object
+        required:
+        - question
+        properties:
+          question:
+            type: object
+            required:
+            - data
+            properties:
+              data:
+                type: object
+                required:
+                - id
+                - type
+                properties:
+                  id:
+                    type: string
+                    pattern: '\d+'
+                  type:
+                    type: string
+                    pattern: '^question$'
+host: localhost:3000
+schemes:
+ - http
