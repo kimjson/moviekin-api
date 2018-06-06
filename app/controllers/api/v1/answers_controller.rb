@@ -1,35 +1,44 @@
-class Api::V1::AnswersController < ApplicationController
-  def show
-    render json: AnswerSerializer.new(Answer.find(params[:id]))
-  end
+# frozen_string_literal: true
 
-  def index
-    render json: AnswerSerializer.new(Answer.all)
-  end
+module Api
+  module V1
+    # CRUD controller for answer model.
+    class AnswersController < ApplicationController
+      def show
+        render json: AnswerSerializer.new(Answer.find(params[:id]))
+      end
 
-  def create
-    answer = Question.find(params[:question_id]).answers.create!(answer_params)
-    render json: AnswerSerializer.new(answer),
-           status: 201,
-           location: [:api, answer]
-  end
+      def index
+        render json: AnswerSerializer.new(Answer.all)
+      end
 
-  def update
-    answer = Answer.find(params[:id])
-    answer.update!(answer_params)
-    render json: AnswerSerializer.new(answer),
-           status: 200,
-           location: [:api, answer]
-  end
+      def create
+        answer = Question.find(params[:question_id])
+                         .answers
+                         .create!(answer_params)
+        render json: AnswerSerializer.new(answer),
+               status: 201,
+               location: [:api, answer]
+      end
 
-  def destroy
-    Answer.find(params[:id]).destroy!
-    head 204
-  end
+      def update
+        answer = Answer.find(params[:id])
+        answer.update!(answer_params)
+        render json: AnswerSerializer.new(answer),
+               status: 200,
+               location: [:api, answer]
+      end
 
-  private
+      def destroy
+        Answer.find(params[:id]).destroy!
+        head 204
+      end
 
-  def answer_params
-    params.require(:answer).permit(:content)
+      private
+
+      def answer_params
+        params.require(:answer).permit(:content)
+      end
+    end
   end
 end

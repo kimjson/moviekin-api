@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Define movie model field validation and relationship
 class Movie < ApplicationRecord
   validates :name, :code, :director, presence: true
   validates :open_year, :production_year,

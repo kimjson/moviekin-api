@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe Question do
@@ -15,14 +17,13 @@ describe Question do
   it { is_expected.to belong_to :movie }
   it { is_expected.to have_many(:answers) }
 
-  describe "#answers association" do
-
+  describe '#answers association' do
     before do
       @question.save
       3.times { FactoryBot.create :answer, question: @question }
     end
 
-    it "destroys the associated answers on self destruct" do
+    it 'destroys the associated answers on self destruct' do
       answers = @question.answers
       @question.destroy
       answers.each do |answer|

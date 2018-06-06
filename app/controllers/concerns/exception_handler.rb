@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Handle 404, 422 error
 module ExceptionHandler
   # provides the more graceful `included` method
   extend ActiveSupport::Concern

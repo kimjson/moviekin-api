@@ -30,3 +30,4 @@ node_modules/
 .vscode/
 
 rubocop.txt
+rubocop_correct.txt

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :movie do
     name { FFaker::Movie.title }
-    code { FFaker::String.from_regexp /[0-9]{8}/ }
+    code { FFaker::String.from_regexp(/[0-9]{8}/) }
     director { FFaker::Name.name }
-    open_year { 1896 + Random.rand(8105) }
-    production_year { 1896 + Random.rand(8105) }
+    open_year { Random.rand(1896..9999) }
+    production_year { Random.rand(1896..9999) }
   end
 end
