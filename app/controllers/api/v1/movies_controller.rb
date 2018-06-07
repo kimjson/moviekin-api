@@ -4,28 +4,26 @@ module Api
   module V1
     # CRUD controller for movie model.
     class MoviesController < ApplicationController
+      SERIALIZER = MovieSerializer
+
       # TODO: embed answer object.
       def show
-        render json: MovieSerializer.new(Movie.find(params[:id]))
+        movie_response data: Movie.find(params[:id])
       end
 
       def index
-        render json: MovieSerializer.new(Movie.all)
+        movie_response data: Movie.all
       end
 
       def create
         movie = Movie.create!(movie_params)
-        render json: MovieSerializer.new(movie),
-               status: 201,
-               location: [:api, movie]
+        movie_response data: movie, status: 201, location: [:api, movie]
       end
 
       def update
         movie = Movie.find(params[:id])
         movie.update!(movie_params)
-        render json: MovieSerializer.new(movie),
-               status: 200,
-               location: [:api, movie]
+        movie_response data: movie, status: 200, location: [:api, movie]
       end
 
       def destroy
@@ -43,6 +41,12 @@ module Api
           :open_year,
           :production_year
         )
+      end
+      
+      def movie_response(args)
+        serialized_args = args.clone
+        serialized_args[:json] = MovieSerializer.new(args[:data])
+        render serialized_args
       end
     end
   end

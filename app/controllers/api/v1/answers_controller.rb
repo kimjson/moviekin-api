@@ -5,28 +5,24 @@ module Api
     # CRUD controller for answer model.
     class AnswersController < ApplicationController
       def show
-        render json: AnswerSerializer.new(Answer.find(params[:id]))
+        answer_response data: Answer.find(params[:id])
       end
 
       def index
-        render json: AnswerSerializer.new(Answer.all)
+        answer_response data: Answer.all
       end
 
       def create
         answer = Question.find(params[:question_id])
-                         .answers
-                         .create!(answer_params)
-        render json: AnswerSerializer.new(answer),
-               status: 201,
-               location: [:api, answer]
+                        .answers
+                        .create!(answer_params)
+        answer_response data: answer, status: 201, location: [:api, answer]
       end
 
       def update
         answer = Answer.find(params[:id])
         answer.update!(answer_params)
-        render json: AnswerSerializer.new(answer),
-               status: 200,
-               location: [:api, answer]
+        answer_response data: answer, status: 200, location: [:api, answer]
       end
 
       def destroy
@@ -38,6 +34,12 @@ module Api
 
       def answer_params
         params.require(:answer).permit(:content)
+      end
+
+      def answer_response(args)
+        serialized_args = args.clone
+        serialized_args[:json] = AnswerSerializer.new(args[:data])
+        render serialized_args
       end
     end
   end
