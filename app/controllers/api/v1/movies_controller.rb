@@ -4,10 +4,10 @@ module Api
   module V1
     # CRUD controller for movie model.
     class MoviesController < ApplicationController
-      SERIALIZER = MovieSerializer
-
       # TODO: embed answer object.
       def show
+        movie = Movie.find(params[:id])
+        # raise Exceptions::RecordNotFound.new('Movie', params[:id]) unless movie
         json_response data: Movie.find(params[:id])
       end
 
@@ -41,11 +41,6 @@ module Api
           :open_year,
           :production_year
         )
-      end
-
-      private
-      def json_response(args)
-        super(args) { MovieSerializer }
       end
     end
   end

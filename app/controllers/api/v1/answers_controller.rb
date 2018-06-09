@@ -35,10 +35,6 @@ module Api
       def answer_params
         params.require(:answer).permit(:content)
       end
-
-      def json_response(args)
-        super(args) { AnswerSerializer }
-      end
     end
   end
 end

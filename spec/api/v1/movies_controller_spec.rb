@@ -43,6 +43,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       end
 
       it 'returns a not found message' do
+        Rails.logger.debug("error body: #{response.body}")
         expect(response.body).to match(/Couldn't find Movie/)
       end
     end

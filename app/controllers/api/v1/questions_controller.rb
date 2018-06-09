@@ -36,11 +36,6 @@ module Api
       def question_params
         params.require(:question).permit(:title, :content)
       end
-
-      private
-      def json_response(args)
-        super(args) { QuestionSerializer }
-      end
     end
   end
 end
