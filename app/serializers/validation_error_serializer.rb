@@ -9,7 +9,7 @@ class ValidationErrorSerializer
   end
 
   def serialize
-    details.map do |detail|
+    @details.map do |detail|
       {
         "status": 422,
         "source": { "pointer": "/data/attributes/#{field}" },

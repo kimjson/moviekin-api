@@ -6,9 +6,7 @@ module Api
     class MoviesController < ApplicationController
       # TODO: embed answer object.
       def show
-        movie = Movie.find(params[:id])
-        # raise Exceptions::RecordNotFound.new('Movie', params[:id]) unless movie
-        json_response data: Movie.find(params[:id])
+        json_response data: Movie.find(params[:id]), options: params
       end
 
       def index

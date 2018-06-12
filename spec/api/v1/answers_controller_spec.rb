@@ -37,7 +37,10 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
 
       it 'returns a not found message' do
-        expect(response.body).to match(/Couldn't find Answer/)
+        json_response[:errors].each do |error| 
+          expect(error[:title]).to match(/^Answer not found$/)
+          expect(error[:detail]).to match(/^Answer not found$/)
+        end
       end
     end
   end
@@ -75,7 +78,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       it { expect(response).to have_http_status(201) }
     end
 
-    context 'when is not created' do
+    context 'field validation error' do
       before(:each) do
         question = FactoryBot.create :question
         @invalid_answer_attributes = { content: nil }
@@ -84,13 +87,14 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
 
       it 'renders an errors json' do
-        answer_response = json_response
-        expect(answer_response).to have_key(:message)
+        expect(json_response).to have_key(:errors)
       end
 
-      it 'renders the json errors on why the answer could not be created' do
-        answer_response = json_response
-        expect(answer_response[:message]).to include "can't be blank"
+      it 'renders the json errors on which field was the problem' do
+        json_response[:errors].each do |error| 
+          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
+          expect(error[:title]).to match(/^Invalid Answer$/)
+        end
       end
 
       it { expect(response).to have_http_status(422) }
@@ -116,29 +120,72 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       it { expect(response).to have_http_status(200) }
     end
 
-    context 'when is not updated' do
+    context 'cannot find answer record to update' do
+      before(:each) do
+        patch "/answers/100",
+              params: { answer: { content: 'Updated content' } }
+      end
+
+      it 'returns status code 404' do
+        expect(response).to have_http_status(404)
+      end
+
+      it 'returns a not found message' do
+        json_response[:errors].each do |error| 
+          expect(error[:title]).to match(/^Answer not found$/)
+          expect(error[:detail]).to match(/^Answer not found$/)
+        end
+      end
+    end
+
+    context 'field validation error' do
       before(:each) do
         patch "/answers/#{@answer.id}",
               params: { answer: { content: nil } }
       end
 
       it 'renders an errors json' do
-        expect(json_response).to have_key(:message)
+        expect(json_response).to have_key(:errors)
       end
 
-      it 'renders the error message on why the answer could not be updated' do
-        expect(json_response[:message]).to include "can't be blank"
+      it 'renders the json errors on which field was the problem' do
+        json_response[:errors].each do |error| 
+          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
+          expect(error[:title]).to match(/^Invalid Answer$/)
+        end
       end
 
       it { expect(response).to have_http_status(422) }
     end
   end
   describe 'DELETE #destroy' do
-    before(:each) do
-      @answer = FactoryBot.create :answer
-      delete "/answers/#{@answer.id}"
+    context 'when is successfully created' do
+      before(:each) do
+        @answer = FactoryBot.create :answer
+        delete "/answers/#{@answer.id}"
+      end
+      
+      it 'returns status code 204(deleted)' do
+        expect(response).to have_http_status(204)
+      end
     end
 
-    it { expect(response).to have_http_status(204) }
+    context 'cannot find answer record to delete' do
+      before(:each) do
+        @answer = FactoryBot.create :answer
+        delete "/answers/100"
+      end
+      
+      it 'returns status code 404(not found)' do
+        expect(response).to have_http_status(404)
+      end
+
+      it 'returns a not found message' do
+        json_response[:errors].each do |error| 
+          expect(error[:title]).to match(/^Answer not found$/)
+          expect(error[:detail]).to match(/^Answer not found$/)
+        end
+      end
+    end
   end
 end

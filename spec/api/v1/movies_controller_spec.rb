@@ -43,8 +43,10 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       end
 
       it 'returns a not found message' do
-        Rails.logger.debug("error body: #{response.body}")
-        expect(response.body).to match(/Couldn't find Movie/)
+        json_response[:errors].each do |error| 
+          expect(error[:title]).to match(/^Movie not found$/)
+          expect(error[:detail]).to match(/^Movie not found$/)
+        end
       end
     end
   end
@@ -94,21 +96,28 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       it { expect(response).to have_http_status(201) }
     end
 
-    # TODO: add more test case (invalid field case)
-    context 'when is not created' do
+    context 'field validation error' do
       before(:each) do
-        @invalid_movie_attributes = { code: nil }
-        post '/movies', params: { movie: @invalid_movie_attributes }
+        @invalid_movie_attributes = {
+          name: nil,
+          code: 'hello',
+          director: 1,
+          open_year:'hey you',
+          production_year: 'bye bye'
+        }
+        post "/movies",
+             params: { movie: @invalid_movie_attributes }
       end
 
       it 'renders an errors json' do
-        movie_response = json_response
-        expect(movie_response).to have_key(:message)
+        expect(json_response).to have_key(:errors)
       end
 
-      it 'renders the json errors on why the movie could not be created' do
-        movie_response = json_response
-        expect(movie_response[:message]).to include "can't be blank"
+      it 'renders the json errors on which field was the problem' do
+        json_response[:errors].each do |error| 
+          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
+          expect(error[:title]).to match(/^Invalid Movie$/)
+        end
       end
 
       it { expect(response).to have_http_status(422) }
@@ -138,18 +147,39 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       it { expect(response).to have_http_status(200) }
     end
 
-    context 'when is not updated' do
+    context 'cannot find movie record to update' do
+      before(:each) do
+        patch "/movies/100",
+              params: { moive: { name: 'Updated name' } }
+      end
+
+      it 'returns status code 404' do
+        expect(response).to have_http_status(404)
+      end
+
+      it 'returns a not found message' do
+        json_response[:errors].each do |error| 
+          expect(error[:title]).to match(/^Movie not found$/)
+          expect(error[:detail]).to match(/^Movie not found$/)
+        end
+      end
+    end
+
+    context 'field validation error' do
       before(:each) do
         patch "/movies/#{@movie.id}",
-              params: { movie: { code: nil } }
+              params: { movie: { name: nil } }
       end
 
       it 'renders an errors json' do
-        expect(json_response).to have_key(:message)
+        expect(json_response).to have_key(:errors)
       end
 
-      it 'renders the error message on why the movie could not be updated' do
-        expect(json_response[:message]).to include "can't be blank"
+      it 'renders the json errors on which field was the problem' do
+        json_response[:errors].each do |error| 
+          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
+          expect(error[:title]).to match(/^Invalid Movie$/)
+        end
       end
 
       it { expect(response).to have_http_status(422) }

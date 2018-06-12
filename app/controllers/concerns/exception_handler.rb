@@ -14,7 +14,7 @@ module ExceptionHandler
         errors: [
           {
             status: 404,
-            title: "#{e.model not found}",
+            title: "#{e.model} not found",
             detail: "#{e.model} not found"
           }
         ]
@@ -27,14 +27,17 @@ module ExceptionHandler
       }
     end
 
-    rescue_from StandardError do |e|
-      render status: 500, json: {
-        errors: [
-          status: 500,
-          title: 'Unknown error',
-          detail: 'Unknown error. Contact API developer',
-        ]
-      } 
-    end
+    # rescue_from StandardError do |e|
+    #   Rails.logger.error '-------- Internal server error --------'
+    #   e.backtrace.each { |line| Rails.logger.error line }
+    #   Rails.logger.error '-------- end --------'
+    #   render status: 500, json: {
+    #     errors: [
+    #       status: 500,
+    #       title: 'Unknown error',
+    #       detail: 'Unknown error. Contact API developer',
+    #     ]
+    #   } 
+    # end
   end
 end

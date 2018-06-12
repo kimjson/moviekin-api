@@ -4,7 +4,6 @@ module Api
   module V1
     # CRUD controller for question model.
     class QuestionsController < ApplicationController
-      # TODO: embed answer object.
       def show
         json_response data: Question.find(params[:id])
       end

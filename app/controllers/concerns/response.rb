@@ -14,8 +14,15 @@ module Response
   end
 
   def json_response(args)
-    serialized_args = args.clone
-    serialized_args[:json] = get_serializer(args[:data]).new(args[:data])
-    render serialized_args
+    serializer = get_serializer(args[:data])
+
+    options = {}
+    options[:include] = params[:include].split(',') if params.key? :include
+    Rails.logger.debug "options: #{options}"
+
+    payload = args.extract!(:status, :location)
+    payload[:json] = serializer.new(args[:data], options)
+
+    render payload
   end
 end
