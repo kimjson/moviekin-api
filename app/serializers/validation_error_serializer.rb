@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
+# Serializer for single field invalidness
 class ValidationErrorSerializer
-
   def initialize(record, field, details)
     @record = record
     @field = field
@@ -14,7 +14,7 @@ class ValidationErrorSerializer
         "status": 422,
         "source": { "pointer": "/data/attributes/#{field}" },
         "title": "Invalid #{resource}",
-        "detail": detail,
+        "detail": detail
       }
     end
   end

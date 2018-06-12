@@ -14,6 +14,7 @@ module Api
       end
 
       def create
+        Rails.logger.debug "movie_params: #{movie_params}"
         movie = Movie.create!(movie_params)
         json_response data: movie, status: 201, location: [:api, movie]
       end
@@ -32,13 +33,11 @@ module Api
       private
 
       def movie_params
-        params.require(:movie).permit(
-          :name,
-          :code,
-          :director,
-          :open_year,
-          :production_year
-        )
+        movie_attributes = %i[name code director open_year production_year]
+        params.require(:data)
+              .permit(:type, :relationships, attributes: movie_attributes)
+              .require(:attributes)
+              .permit(*movie_attributes)
       end
     end
   end

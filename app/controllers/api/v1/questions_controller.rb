@@ -33,7 +33,10 @@ module Api
       private
 
       def question_params
-        params.require(:question).permit(:title, :content)
+        question_attributes = %i[title content]
+        params.require(:data)
+              .permit(:type, :relationships, attributes: question_attributes)
+              .require(:attributes).permit(*question_attributes)
       end
     end
   end

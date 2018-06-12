@@ -14,8 +14,8 @@ module Api
 
       def create
         answer = Question.find(params[:question_id])
-                        .answers
-                        .create!(answer_params)
+                         .answers
+                         .create!(answer_params)
         json_response data: answer, status: 201, location: [:api, answer]
       end
 
@@ -33,7 +33,11 @@ module Api
       private
 
       def answer_params
-        params.require(:answer).permit(:content)
+        answer_attributes = %i[content]
+        params.require(:data)
+              .permit(:type, :relationships, attributes: answer_attributes)
+              .require(:attributes)
+              .permit(*answer_attributes)
       end
     end
   end

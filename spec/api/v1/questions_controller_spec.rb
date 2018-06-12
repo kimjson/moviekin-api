@@ -53,7 +53,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       end
 
       it 'returns a not found message' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:title]).to match(/^Question not found$/)
           expect(error[:detail]).to match(/^Question not found$/)
         end
@@ -80,8 +80,12 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       before(:each) do
         movie = FactoryBot.create :movie
         @question_attributes = FactoryBot.attributes_for :question
-        post "/movies/#{movie.id}/questions",
-             params: { question: @question_attributes }
+        post "/movies/#{movie.id}/questions", params: {
+          data: {
+            type: 'question',
+            attributes: @question_attributes
+          }
+        }
       end
 
       it 'renders the json representation for the movie record just created' do
@@ -96,20 +100,24 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
 
       it { expect(response).to have_http_status(201) }
     end
-    
+
     context 'movie not found' do
       before(:each) do
         @question_attributes = FactoryBot.attributes_for :question
-        post "/movies/100/questions",
-             params: { question: @question_attributes }
+        post '/movies/100/questions', params: {
+          data: {
+            type: 'question',
+            attributes: @question_attributes
+          }
+        }
       end
-      
+
       it 'returns status code 404' do
         expect(response).to have_http_status(404)
       end
 
       it 'returns a not found message' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:title]).to match(/^Movie not found$/)
           expect(error[:detail]).to match(/^Movie not found$/)
         end
@@ -120,8 +128,12 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       before(:each) do
         movie = FactoryBot.create :movie
         @invalid_question_attributes = { content: nil, title: nil }
-        post "/movies/#{movie.id}/questions",
-             params: { question: @invalid_question_attributes }
+        post "/movies/#{movie.id}/questions", params: {
+          data: {
+            type: 'question',
+            attributes: @invalid_question_attributes
+          }
+        }
       end
 
       it 'renders an errors json' do
@@ -129,7 +141,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       end
 
       it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
           expect(error[:title]).to match(/^Invalid Question$/)
         end
@@ -146,13 +158,15 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
 
     context 'when is successfully updated' do
       before(:each) do
-        patch "/questions/#{@question.id}",
-              params: {
-                question: {
-                  title: 'Updated title',
-                  content: 'Updated content'
-                }
-              }
+        patch "/questions/#{@question.id}", params: {
+          data: {
+            type: 'question',
+            attributes: {
+              title: 'Updated title',
+              content: 'Updated content'
+            }
+          }
+        }
       end
 
       it 'renders the json for the updated question' do
@@ -168,8 +182,14 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
 
     context 'cannot find question record to update' do
       before(:each) do
-        patch "/questions/100",
-              params: { question: { content: 'Updated content' } }
+        patch '/questions/100', params: {
+          data: {
+            type: 'question',
+            attributes: {
+              content: 'Updated content'
+            }
+          }
+        }
       end
 
       it 'returns status code 404' do
@@ -177,7 +197,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       end
 
       it 'returns a not found message' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:title]).to match(/^Question not found$/)
           expect(error[:detail]).to match(/^Question not found$/)
         end
@@ -186,8 +206,14 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
 
     context 'field validation error' do
       before(:each) do
-        patch "/questions/#{@question.id}",
-              params: { question: { content: nil } }
+        patch "/questions/#{@question.id}", params: {
+          data: {
+            type: 'question',
+            attributes: {
+              content: nil
+            }
+          }
+        }
       end
 
       it 'renders an errors json' do
@@ -195,7 +221,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
       end
 
       it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
           expect(error[:title]).to match(/^Invalid Question$/)
         end

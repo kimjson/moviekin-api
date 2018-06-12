@@ -43,7 +43,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       end
 
       it 'returns a not found message' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:title]).to match(/^Movie not found$/)
           expect(error[:detail]).to match(/^Movie not found$/)
         end
@@ -69,7 +69,12 @@ RSpec.describe Api::V1::MoviesController, type: :request do
     context 'when is successfully created' do
       before(:each) do
         @movie_attributes = FactoryBot.attributes_for :movie
-        post '/movies', params: { movie: @movie_attributes }
+        post '/movies', params: {
+          data: {
+            type: 'movie',
+            attributes: @movie_attributes
+          }
+        }
       end
 
       it 'renders the json representation for the movie record just created' do
@@ -102,11 +107,15 @@ RSpec.describe Api::V1::MoviesController, type: :request do
           name: nil,
           code: 'hello',
           director: 1,
-          open_year:'hey you',
+          open_year: 'hey you',
           production_year: 'bye bye'
         }
-        post "/movies",
-             params: { movie: @invalid_movie_attributes }
+        post '/movies', params: {
+          data: {
+            type: 'movie',
+            attributes: @invalid_movie_attributes
+          }
+        }
       end
 
       it 'renders an errors json' do
@@ -114,7 +123,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       end
 
       it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
           expect(error[:title]).to match(/^Invalid Movie$/)
         end
@@ -131,8 +140,12 @@ RSpec.describe Api::V1::MoviesController, type: :request do
 
     context 'when is successfully updated' do
       before(:each) do
-        patch "/movies/#{@movie.id}",
-              params: { movie: { name: 'Updated name', code: 'Updated code' } }
+        patch "/movies/#{@movie.id}", params: {
+          data: {
+            type: 'movie',
+            attributes: { name: 'Updated name', code: 'Updated code' }
+          }
+        }
       end
 
       it 'renders the json for the updated movie' do
@@ -149,8 +162,12 @@ RSpec.describe Api::V1::MoviesController, type: :request do
 
     context 'cannot find movie record to update' do
       before(:each) do
-        patch "/movies/100",
-              params: { moive: { name: 'Updated name' } }
+        patch '/movies/100', params: {
+          data: {
+            type: 'movie',
+            attributes: { name: 'Updated name' }
+          }
+        }
       end
 
       it 'returns status code 404' do
@@ -158,7 +175,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       end
 
       it 'returns a not found message' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:title]).to match(/^Movie not found$/)
           expect(error[:detail]).to match(/^Movie not found$/)
         end
@@ -167,8 +184,12 @@ RSpec.describe Api::V1::MoviesController, type: :request do
 
     context 'field validation error' do
       before(:each) do
-        patch "/movies/#{@movie.id}",
-              params: { movie: { name: nil } }
+        patch "/movies/#{@movie.id}", params: {
+          data: {
+            type: 'movie',
+            attributes: { name: nil }
+          }
+        }
       end
 
       it 'renders an errors json' do
@@ -176,7 +197,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       end
 
       it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
           expect(error[:title]).to match(/^Invalid Movie$/)
         end

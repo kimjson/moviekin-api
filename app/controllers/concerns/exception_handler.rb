@@ -4,7 +4,7 @@
 module ExceptionHandler
   # provides the more graceful `included` method
   extend ActiveSupport::Concern
-  
+
   included do
     # rescue_from Exceptions::RecordNotFound do |e|
     #   json_error title: e.title, detail: e.detail, status: 404
@@ -37,7 +37,7 @@ module ExceptionHandler
     #       title: 'Unknown error',
     #       detail: 'Unknown error. Contact API developer',
     #     ]
-    #   } 
+    #   }
     # end
   end
 end

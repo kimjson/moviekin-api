@@ -37,7 +37,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
 
       it 'returns a not found message' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:title]).to match(/^Answer not found$/)
           expect(error[:detail]).to match(/^Answer not found$/)
         end
@@ -64,8 +64,12 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       before(:each) do
         question = FactoryBot.create :question
         @answer_attributes = FactoryBot.attributes_for :answer
-        post "/questions/#{question.id}/answers",
-             params: { answer: @answer_attributes }
+        post "/questions/#{question.id}/answers", params: {
+          data: {
+            type: 'answer',
+            attributes: @answer_attributes
+          }
+        }
       end
 
       it 'renders the json representation for the answer record just created' do
@@ -82,8 +86,12 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       before(:each) do
         question = FactoryBot.create :question
         @invalid_answer_attributes = { content: nil }
-        post "/questions/#{question.id}/answers",
-             params: { answer: @invalid_answer_attributes }
+        post "/questions/#{question.id}/answers", params: {
+          data: {
+            type: 'answer',
+            attributes: @invalid_answer_attributes
+          }
+        }
       end
 
       it 'renders an errors json' do
@@ -91,7 +99,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
 
       it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
           expect(error[:title]).to match(/^Invalid Answer$/)
         end
@@ -108,8 +116,12 @@ RSpec.describe Api::V1::AnswersController, type: :request do
 
     context 'when is successfully updated' do
       before(:each) do
-        patch "/answers/#{@answer.id}",
-              params: { answer: { content: 'Updated content' } }
+        patch "/answers/#{@answer.id}", params: {
+          data: {
+            type: 'answer',
+            attributes: { content: 'Updated content' }
+          }
+        }
       end
 
       it 'renders the json for the updated answer' do
@@ -122,8 +134,12 @@ RSpec.describe Api::V1::AnswersController, type: :request do
 
     context 'cannot find answer record to update' do
       before(:each) do
-        patch "/answers/100",
-              params: { answer: { content: 'Updated content' } }
+        patch '/answers/100', params: {
+          data: {
+            type: 'answer',
+            attributes: { content: 'Updated content' }
+          }
+        }
       end
 
       it 'returns status code 404' do
@@ -131,7 +147,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
 
       it 'returns a not found message' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:title]).to match(/^Answer not found$/)
           expect(error[:detail]).to match(/^Answer not found$/)
         end
@@ -140,8 +156,12 @@ RSpec.describe Api::V1::AnswersController, type: :request do
 
     context 'field validation error' do
       before(:each) do
-        patch "/answers/#{@answer.id}",
-              params: { answer: { content: nil } }
+        patch "/answers/#{@answer.id}", params: {
+          data: {
+            type: 'answer',
+            attributes: { content: nil }
+          }
+        }
       end
 
       it 'renders an errors json' do
@@ -149,7 +169,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
 
       it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
           expect(error[:title]).to match(/^Invalid Answer$/)
         end
@@ -164,7 +184,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         @answer = FactoryBot.create :answer
         delete "/answers/#{@answer.id}"
       end
-      
+
       it 'returns status code 204(deleted)' do
         expect(response).to have_http_status(204)
       end
@@ -173,15 +193,15 @@ RSpec.describe Api::V1::AnswersController, type: :request do
     context 'cannot find answer record to delete' do
       before(:each) do
         @answer = FactoryBot.create :answer
-        delete "/answers/100"
+        delete '/answers/100'
       end
-      
+
       it 'returns status code 404(not found)' do
         expect(response).to have_http_status(404)
       end
 
       it 'returns a not found message' do
-        json_response[:errors].each do |error| 
+        json_response[:errors].each do |error|
           expect(error[:title]).to match(/^Answer not found$/)
           expect(error[:detail]).to match(/^Answer not found$/)
         end

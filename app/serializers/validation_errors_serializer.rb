@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Serializer for error caused by invalid fields
 class ValidationErrorsSerializer
   attr_reader :record
 

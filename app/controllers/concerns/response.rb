@@ -5,12 +5,12 @@ module Response
   SERIALIZER_MAP = {
     'Movie' => MovieSerializer,
     'Question' => QuestionSerializer,
-    'Answer' => AnswerSerializer,
-  }
+    'Answer' => AnswerSerializer
+  }.freeze
 
   def get_serializer(data)
     record = data.respond_to?('each') ? data[0] : data
-    return SERIALIZER_MAP[record.class.to_s]
+    SERIALIZER_MAP[record.class.to_s]
   end
 
   def json_response(args)
@@ -18,7 +18,6 @@ module Response
 
     options = {}
     options[:include] = params[:include].split(',') if params.key? :include
-    Rails.logger.debug "options: #{options}"
 
     payload = args.extract!(:status, :location)
     payload[:json] = serializer.new(args[:data], options)
