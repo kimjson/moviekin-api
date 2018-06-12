@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 require_relative '../../support/request_helpers'
+require 'shared_examples'
 
 RSpec.configure do |c|
   c.include Request::JsonHelpers
@@ -38,31 +39,12 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         get '/movies/100'
       end
 
-      it 'returns status code 404' do
-        expect(response).to have_http_status(404)
-      end
-
-      it 'returns a not found message' do
-        json_response[:errors].each do |error|
-          expect(error[:title]).to match(/^Movie not found$/)
-          expect(error[:detail]).to match(/^Movie not found$/)
-        end
-      end
+      include_examples 'not found', 'movie'
     end
   end
 
   describe 'GET #index' do
-    before(:each) do
-      4.times { FactoryBot.create :movie }
-      get '/movies'
-    end
-
-    it 'returns 4 records from the database' do
-      movies_response = json_response[:data]
-      expect(movies_response.size).to eq(4)
-    end
-
-    it { expect(response).to have_http_status(200) }
+    include_examples 'returns 4 records from the database', 'movie'
   end
 
   describe 'POST #create' do
@@ -81,21 +63,9 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         movie_response = json_response[:data]
 
         expect(movie_response).not_to be_empty
-        expect(movie_response[:attributes][:name]).to(
-          eql @movie_attributes[:name]
-        )
-        expect(movie_response[:attributes][:code]).to(
-          eql @movie_attributes[:code]
-        )
-        expect(movie_response[:attributes][:director]).to(
-          eql @movie_attributes[:director]
-        )
-        expect(movie_response[:attributes][:open_year]).to(
-          eql @movie_attributes[:open_year]
-        )
-        expect(movie_response[:attributes][:production_year]).to(
-          eql @movie_attributes[:production_year]
-        )
+        @movie_attributes.each do |key, value|
+          expect(movie_response[:attributes][key]).to eql value
+        end
       end
 
       it { expect(response).to have_http_status(201) }
@@ -118,18 +88,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         }
       end
 
-      it 'renders an errors json' do
-        expect(json_response).to have_key(:errors)
-      end
-
-      it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error|
-          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
-          expect(error[:title]).to match(/^Invalid Movie$/)
-        end
-      end
-
-      it { expect(response).to have_http_status(422) }
+      include_examples 'field validation error result', 'movie'
     end
   end
 
@@ -143,19 +102,22 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         patch "/movies/#{@movie.id}", params: {
           data: {
             type: 'movie',
-            attributes: { name: 'Updated name', code: 'Updated code' }
+            attributes: {
+              name: 'Updated name',
+              code: 'Updated code'
+            }
           }
         }
       end
 
-      it 'renders the json for the updated movie' do
-        movie_response = json_response[:data]
-
-        expect(movie_response).not_to be_empty
-        expect(movie_response[:id]).to eql @movie.id.to_s
-        expect(movie_response[:attributes][:name]).to eql 'Updated name'
-        expect(movie_response[:attributes][:code]).to eql 'Updated code'
+      it 'ID did not change after update' do
+        expect(json_response[:data][:id]).to eql @movie.id.to_s
       end
+
+      include_examples 'response attributes correct', {
+        name: 'Updated name',
+        code: 'Updated code'
+      }
 
       it { expect(response).to have_http_status(200) }
     end
@@ -170,16 +132,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         }
       end
 
-      it 'returns status code 404' do
-        expect(response).to have_http_status(404)
-      end
-
-      it 'returns a not found message' do
-        json_response[:errors].each do |error|
-          expect(error[:title]).to match(/^Movie not found$/)
-          expect(error[:detail]).to match(/^Movie not found$/)
-        end
-      end
+      include_examples 'not found', 'movie'
     end
 
     context 'field validation error' do
@@ -192,18 +145,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         }
       end
 
-      it 'renders an errors json' do
-        expect(json_response).to have_key(:errors)
-      end
-
-      it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error|
-          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
-          expect(error[:title]).to match(/^Invalid Movie$/)
-        end
-      end
-
-      it { expect(response).to have_http_status(422) }
+      include_examples 'field validation error result', 'movie'
     end
   end
   describe 'DELETE #destroy' do

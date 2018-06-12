@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 require_relative '../../support/request_helpers'
+require 'shared_examples'
 
 RSpec.configure do |c|
   c.include Request::JsonHelpers
@@ -22,9 +23,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         expect(answer_response[:attributes][:content]).to eql @answer.content
       end
 
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
-      end
+      it { expect(response).to have_http_status(200) }
     end
 
     context 'when the record does not exist' do
@@ -32,31 +31,12 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         get '/answers/100'
       end
 
-      it 'returns status code 404' do
-        expect(response).to have_http_status(404)
-      end
-
-      it 'returns a not found message' do
-        json_response[:errors].each do |error|
-          expect(error[:title]).to match(/^Answer not found$/)
-          expect(error[:detail]).to match(/^Answer not found$/)
-        end
-      end
+      include_examples 'not found', 'answer'
     end
   end
 
   describe 'GET #index' do
-    before(:each) do
-      4.times { FactoryBot.create :answer }
-      get '/answers'
-    end
-
-    it 'returns 4 records from the database' do
-      answers_response = json_response[:data]
-      expect(answers_response.size).to eq(4)
-    end
-
-    it { expect(response).to have_http_status(200) }
+    include_examples 'returns 4 records from the database', 'answer'
   end
 
   describe 'POST #create' do
@@ -74,9 +54,11 @@ RSpec.describe Api::V1::AnswersController, type: :request do
 
       it 'renders the json representation for the answer record just created' do
         answer_response = json_response[:data]
-        expect(answer_response[:attributes][:content]).to(
-          eql @answer_attributes[:content]
-        )
+        
+        expect(answer_response).not_to be_empty
+        @answer_attributes.each do |key, value|
+          expect(answer_response[:attributes][key]).to eql value
+        end
       end
 
       it { expect(response).to have_http_status(201) }
@@ -94,18 +76,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         }
       end
 
-      it 'renders an errors json' do
-        expect(json_response).to have_key(:errors)
-      end
-
-      it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error|
-          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
-          expect(error[:title]).to match(/^Invalid Answer$/)
-        end
-      end
-
-      it { expect(response).to have_http_status(422) }
+      include_examples 'field validation error result', 'answer'
     end
   end
 
@@ -124,10 +95,13 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         }
       end
 
-      it 'renders the json for the updated answer' do
-        answer_response = json_response[:data]
-        expect(answer_response[:attributes][:content]).to eql 'Updated content'
+      it 'ID matches' do
+        expect(json_response[:data][:id]).to eql @answer.id.to_s
       end
+
+      include_examples 'response attributes correct', {
+        content: 'Updated content'
+      }
 
       it { expect(response).to have_http_status(200) }
     end
@@ -142,16 +116,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         }
       end
 
-      it 'returns status code 404' do
-        expect(response).to have_http_status(404)
-      end
-
-      it 'returns a not found message' do
-        json_response[:errors].each do |error|
-          expect(error[:title]).to match(/^Answer not found$/)
-          expect(error[:detail]).to match(/^Answer not found$/)
-        end
-      end
+      include_examples 'not found', 'answer'
     end
 
     context 'field validation error' do
@@ -164,18 +129,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         }
       end
 
-      it 'renders an errors json' do
-        expect(json_response).to have_key(:errors)
-      end
-
-      it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error|
-          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
-          expect(error[:title]).to match(/^Invalid Answer$/)
-        end
-      end
-
-      it { expect(response).to have_http_status(422) }
+      include_examples 'field validation error result', 'answer'
     end
   end
   describe 'DELETE #destroy' do
@@ -196,16 +150,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         delete '/answers/100'
       end
 
-      it 'returns status code 404(not found)' do
-        expect(response).to have_http_status(404)
-      end
-
-      it 'returns a not found message' do
-        json_response[:errors].each do |error|
-          expect(error[:title]).to match(/^Answer not found$/)
-          expect(error[:detail]).to match(/^Answer not found$/)
-        end
-      end
+      include_examples 'not found', 'answer'
     end
   end
 end

@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 require_relative '../../support/request_helpers'
+require 'shared_examples'
 
 RSpec.configure do |c|
   c.include Request::JsonHelpers
@@ -25,9 +26,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         )
       end
 
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
-      end
+      it { expect(response).to have_http_status(200) }
     end
 
     context 'requests existing question record including its answers' do
@@ -48,31 +47,15 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         get '/questions/100'
       end
 
-      it 'returns status code 404' do
-        expect(response).to have_http_status(404)
-      end
-
-      it 'returns a not found message' do
-        json_response[:errors].each do |error|
-          expect(error[:title]).to match(/^Question not found$/)
-          expect(error[:detail]).to match(/^Question not found$/)
-        end
-      end
+      include_examples 'not found', 'question'
     end
   end
 
   describe 'GET #index' do
-    before(:each) do
-      4.times { FactoryBot.create :question }
-      get '/questions'
-    end
-
-    it 'returns 4 records from the database' do
-      questions_response = json_response[:data]
-      expect(questions_response.size).to eq(4)
-    end
-
-    it { expect(response).to have_http_status(200) }
+    include_examples(
+      'returns 4 records from the database',
+      'question',
+    )
   end
 
   describe 'POST #create' do
@@ -90,12 +73,11 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
 
       it 'renders the json representation for the movie record just created' do
         question_response = json_response[:data]
-        expect(question_response[:attributes][:title]).to(
-          eql @question_attributes[:title]
-        )
-        expect(question_response[:attributes][:content]).to(
-          eql @question_attributes[:content]
-        )
+
+        expect(question_response).not_to be_empty
+        @question_attributes.each do |key, value|
+          expect(question_response[:attributes][key]).to eql value
+        end
       end
 
       it { expect(response).to have_http_status(201) }
@@ -112,16 +94,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         }
       end
 
-      it 'returns status code 404' do
-        expect(response).to have_http_status(404)
-      end
-
-      it 'returns a not found message' do
-        json_response[:errors].each do |error|
-          expect(error[:title]).to match(/^Movie not found$/)
-          expect(error[:detail]).to match(/^Movie not found$/)
-        end
-      end
+      include_examples 'not found', 'movie'
     end
 
     context 'field validation error' do
@@ -135,19 +108,8 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
           }
         }
       end
-
-      it 'renders an errors json' do
-        expect(json_response).to have_key(:errors)
-      end
-
-      it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error|
-          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
-          expect(error[:title]).to match(/^Invalid Question$/)
-        end
-      end
-
-      it { expect(response).to have_http_status(422) }
+      
+      include_examples 'field validation error result', 'question', 'Questions'
     end
   end
 
@@ -169,13 +131,14 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         }
       end
 
-      it 'renders the json for the updated question' do
-        question_response = json_response[:data]
-        expect(question_response[:attributes][:content]).to(
-          eql 'Updated content'
-        )
-        expect(question_response[:attributes][:title]).to eql 'Updated title'
+      it 'ID matches' do
+        expect(json_response[:data][:id]).to eql @question.id.to_s
       end
+
+      include_examples 'response attributes correct', {
+        title: 'Updated title',
+        content: 'Updated content'
+      }
 
       it { expect(response).to have_http_status(200) }
     end
@@ -192,16 +155,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         }
       end
 
-      it 'returns status code 404' do
-        expect(response).to have_http_status(404)
-      end
-
-      it 'returns a not found message' do
-        json_response[:errors].each do |error|
-          expect(error[:title]).to match(/^Question not found$/)
-          expect(error[:detail]).to match(/^Question not found$/)
-        end
-      end
+      include_examples 'not found', 'question'
     end
 
     context 'field validation error' do
@@ -216,18 +170,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         }
       end
 
-      it 'renders an errors json' do
-        expect(json_response).to have_key(:errors)
-      end
-
-      it 'renders the json errors on which field was the problem' do
-        json_response[:errors].each do |error|
-          expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
-          expect(error[:title]).to match(/^Invalid Question$/)
-        end
-      end
-
-      it { expect(response).to have_http_status(422) }
+      include_examples 'field validation error result', 'question', 'Questions'
     end
   end
   describe 'DELETE #destroy' do
