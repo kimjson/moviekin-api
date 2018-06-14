@@ -6,9 +6,6 @@ module ExceptionHandler
   extend ActiveSupport::Concern
 
   included do
-    # rescue_from Exceptions::RecordNotFound do |e|
-    #   json_error title: e.title, detail: e.detail, status: 404
-    # end
     rescue_from ActiveRecord::RecordNotFound do |e|
       render status: 404, json: {
         errors: [
@@ -26,18 +23,5 @@ module ExceptionHandler
         errors: ValidationErrorsSerializer.new(e.record).serialize
       }
     end
-
-    # rescue_from StandardError do |e|
-    #   Rails.logger.error '-------- Internal server error --------'
-    #   e.backtrace.each { |line| Rails.logger.error line }
-    #   Rails.logger.error '-------- end --------'
-    #   render status: 500, json: {
-    #     errors: [
-    #       status: 500,
-    #       title: 'Unknown error',
-    #       detail: 'Unknown error. Contact API developer',
-    #     ]
-    #   }
-    # end
   end
 end

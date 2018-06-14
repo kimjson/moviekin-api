@@ -16,11 +16,8 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         get "/answers/#{@answer.id}"
       end
 
-      it 'returns the answer' do
-        answer_response = json_response[:data]
-        expect(answer_response).not_to be_empty
-        expect(answer_response[:id]).to eq(@answer.id.to_s)
-        expect(answer_response[:attributes][:content]).to eql @answer.content
+      include_examples 'response attributes correct v2' do
+        let(:target_attributes) { @answer.as_json.symbolize_keys.extract!(:content) }
       end
 
       it { expect(response).to have_http_status(200) }
@@ -52,13 +49,8 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         }
       end
 
-      it 'renders the json representation for the answer record just created' do
-        answer_response = json_response[:data]
-        
-        expect(answer_response).not_to be_empty
-        @answer_attributes.each do |key, value|
-          expect(answer_response[:attributes][key]).to eql value
-        end
+      include_examples 'response attributes correct v2' do
+        let(:target_attributes) { @answer_attributes }
       end
 
       it { expect(response).to have_http_status(201) }
@@ -83,6 +75,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
   describe 'PUT/PATCH #update' do
     before(:each) do
       @answer = FactoryBot.create :answer
+      @new_answer_attributes = FactoryBot.attributes_for :answer
     end
 
     context 'when is successfully updated' do
@@ -90,18 +83,18 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         patch "/answers/#{@answer.id}", params: {
           data: {
             type: 'answer',
-            attributes: { content: 'Updated content' }
+            attributes: @new_answer_attributes
           }
         }
+      end
+
+      include_examples 'response attributes correct v2' do
+        let(:target_attributes) { @new_answer_attributes }
       end
 
       it 'ID matches' do
         expect(json_response[:data][:id]).to eql @answer.id.to_s
       end
-
-      include_examples 'response attributes correct', {
-        content: 'Updated content'
-      }
 
       it { expect(response).to have_http_status(200) }
     end
@@ -111,7 +104,7 @@ RSpec.describe Api::V1::AnswersController, type: :request do
         patch '/answers/100', params: {
           data: {
             type: 'answer',
-            attributes: { content: 'Updated content' }
+            attributes: @new_answer_attributes
           }
         }
       end

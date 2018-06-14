@@ -1,4 +1,6 @@
-RSpec.shared_examples "not found" do |type|
+# frozen_string_literal: true
+
+RSpec.shared_examples 'not found' do |type|
   it 'returns status code 404' do
     expect(response).to have_http_status(404)
   end
@@ -11,7 +13,7 @@ RSpec.shared_examples "not found" do |type|
   end
 end
 
-RSpec.shared_examples "returns 4 records from the database" do |type|
+RSpec.shared_examples 'returns 4 records from the database' do |type|
   before(:each) do
     4.times { FactoryBot.create type.to_sym }
     get "/#{type.pluralize}"
@@ -24,7 +26,7 @@ RSpec.shared_examples "returns 4 records from the database" do |type|
   it { expect(response).to have_http_status(200) }
 end
 
-RSpec.shared_examples "field validation error result" do |type|
+RSpec.shared_examples 'field validation error result' do |type|
   it 'renders an errors json' do
     expect(json_response).to have_key(:errors)
   end
@@ -39,11 +41,30 @@ RSpec.shared_examples "field validation error result" do |type|
   it { expect(response).to have_http_status(422) }
 end
 
-RSpec.shared_examples "response attributes correct" do |target_attributes|
+RSpec.shared_examples 'response attributes correct' do |target_attributes|
   it 'renders the json for the updated record' do
     expect(json_response[:data]).not_to be_empty
     target_attributes.each do |key, value|
       expect(json_response[:data][:attributes][key]).to eql value
     end
   end
+end
+
+RSpec.shared_examples 'returns record with correct id' do
+  it 'returns the record with correct id' do
+    expect(json_response[:data][:id]).to eql target_id
+  end
+end
+
+RSpec.shared_examples 'response attributes correct v2' do
+  it 'renders the json for the updated record' do
+    expect(json_response[:data]).not_to be_empty
+    target_attributes.each do |key, value|
+      expect(json_response[:data][:attributes][key]).to eql value
+    end
+  end
+end
+
+RSpec.shared_examples 'returns status code 200' do
+  it { expect(response).to have_http_status(200) }
 end

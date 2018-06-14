@@ -20,7 +20,6 @@ Rails.application.routes.draw do
         resources :answers, only: %i[create]
       end
       resources :answers, only: %i[show index update destroy]
-      resources :apidocs, only: %i[index]
       get '/swagger',
           to: redirect('/assets/swagger-ui-dist/index.html?url=/swagger.json')
     end

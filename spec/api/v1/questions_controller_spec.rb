@@ -16,14 +16,10 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         get "/questions/#{@question.id}"
       end
 
-      it 'returns the question' do
-        question_response = json_response[:data]
-        expect(question_response).not_to be_empty
-        expect(question_response[:id]).to eql @question.id.to_s
-        expect(question_response[:attributes][:title]).to eql @question.title
-        expect(question_response[:attributes][:content]).to(
-          eql @question.content
-        )
+      include_examples 'response attributes correct v2' do
+        let(:target_attributes) do
+          @question.as_json.symbolize_keys.extract!(:title, :content)
+        end
       end
 
       it { expect(response).to have_http_status(200) }
@@ -71,13 +67,8 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         }
       end
 
-      it 'renders the json representation for the movie record just created' do
-        question_response = json_response[:data]
-
-        expect(question_response).not_to be_empty
-        @question_attributes.each do |key, value|
-          expect(question_response[:attributes][key]).to eql value
-        end
+      include_examples 'response attributes correct v2' do
+        let(:target_attributes) { @question_attributes }
       end
 
       it { expect(response).to have_http_status(201) }
@@ -116,6 +107,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
   describe 'PUT/PATCH #update' do
     before(:each) do
       @question = FactoryBot.create :question
+      @new_question_attributes = FactoryBot.attributes_for :question
     end
 
     context 'when is successfully updated' do
@@ -123,10 +115,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         patch "/questions/#{@question.id}", params: {
           data: {
             type: 'question',
-            attributes: {
-              title: 'Updated title',
-              content: 'Updated content'
-            }
+            attributes: @new_question_attributes
           }
         }
       end
@@ -135,10 +124,9 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         expect(json_response[:data][:id]).to eql @question.id.to_s
       end
 
-      include_examples 'response attributes correct', {
-        title: 'Updated title',
-        content: 'Updated content'
-      }
+      include_examples 'response attributes correct v2' do
+        let(:target_attributes) { @new_question_attributes }
+      end
 
       it { expect(response).to have_http_status(200) }
     end
@@ -148,9 +136,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
         patch '/questions/100', params: {
           data: {
             type: 'question',
-            attributes: {
-              content: 'Updated content'
-            }
+            attributes: @new_question_attributes
           }
         }
       end

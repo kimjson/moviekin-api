@@ -4,7 +4,6 @@ module Api
   module V1
     # CRUD controller for movie model.
     class MoviesController < ApplicationController
-      # TODO: embed answer object.
       def show
         json_response data: Movie.find(params[:id]), options: params
       end

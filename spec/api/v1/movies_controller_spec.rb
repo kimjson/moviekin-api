@@ -17,21 +17,23 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         get "/movies/#{@movie.id}"
       end
 
-      it 'returns the movie' do
-        movie_response = json_response[:data]
-        expect(movie_response).not_to be_empty
-        expect(movie_response[:id]).to eql @movie.id.to_s
-        expect(movie_response[:attributes][:name]).to eql @movie.name
-        expect(movie_response[:attributes][:code]).to eql @movie.code
-        expect(movie_response[:attributes][:director]).to eql @movie.director
-        expect(movie_response[:attributes][:open_year]).to eql @movie.open_year
-        expect(movie_response[:attributes][:production_year]).to(
-          eql @movie.production_year
-        )
+      include_examples 'response attributes correct v2' do
+        let(:target_attributes) do
+          @movie.as_json.symbolize_keys.extract!(
+            :name,
+            :code,
+            :director,
+            :open_year,
+            :production_year
+          )
+        end
       end
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
+
+      include_examples 'returns record with correct id' do
+        let(:target_id) { @movie.id.to_s }
       end
+      
+      it { expect(response).to have_http_status(200) }
     end
 
     context 'when the record does not exist' do
@@ -59,13 +61,8 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         }
       end
 
-      it 'renders the json representation for the movie record just created' do
-        movie_response = json_response[:data]
-
-        expect(movie_response).not_to be_empty
-        @movie_attributes.each do |key, value|
-          expect(movie_response[:attributes][key]).to eql value
-        end
+      include_examples 'response attributes correct v2' do
+        let(:target_attributes) { @movie_attributes }
       end
 
       it { expect(response).to have_http_status(201) }
@@ -95,6 +92,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
   describe 'PUT/PATCH #update' do
     before(:each) do
       @movie = FactoryBot.create :movie
+      @new_movie_attributes = FactoryBot.attributes_for :movie
     end
 
     context 'when is successfully updated' do
@@ -102,10 +100,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         patch "/movies/#{@movie.id}", params: {
           data: {
             type: 'movie',
-            attributes: {
-              name: 'Updated name',
-              code: 'Updated code'
-            }
+            attributes: @new_movie_attributes
           }
         }
       end
@@ -114,10 +109,9 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         expect(json_response[:data][:id]).to eql @movie.id.to_s
       end
 
-      include_examples 'response attributes correct', {
-        name: 'Updated name',
-        code: 'Updated code'
-      }
+      include_examples 'response attributes correct v2' do
+        let(:target_attributes) { @new_movie_attributes }
+      end
 
       it { expect(response).to have_http_status(200) }
     end
@@ -127,7 +121,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         patch '/movies/100', params: {
           data: {
             type: 'movie',
-            attributes: { name: 'Updated name' }
+            attributes: @new_movie_attributes
           }
         }
       end
