@@ -5,20 +5,18 @@ application up and running.
 
 Things you may want to cover:
 
-* Ruby version
+* Ruby version: 2.5.1
 
 * System dependencies
 
-* Configuration
+* Configuration: default
 
-* Database creation
+* Database creation: none(sqlite3)
 
-* Database initialization
+* Database initialization: none(sqlite3)
 
-* How to run the test suite
+* How to run the test suite: $ rspec spec/
 
-* Services (job queues, cache servers, search engines, etc.)
+* Services (job queues, cache servers, search engines, etc.): none
 
-* Deployment instructions
-
-* ...
+* Deployment instructions: $ rails server

@@ -24,3 +24,10 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+node_modules/
+
+.vscode/
+
+rubocop.txt
+rubocop_correct.txt
