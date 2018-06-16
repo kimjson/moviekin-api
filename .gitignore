@@ -31,3 +31,5 @@ node_modules/
 
 rubocop.txt
 rubocop_correct.txt
+
+.idea/

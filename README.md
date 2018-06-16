@@ -1,22 +1,37 @@
-# README
+# MovieKin API
+RoR API part of MovieKin, stackoverflow clone service for Q&A about movies.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Tech Stack
+* Ruby (v2.5.1)
+* Ruby on Rails (v5.2.0)
+* RSpec (v3.7)
+* Rubocop (v0.56.0)
 
-Things you may want to cover:
+## System Environment
 
-* Ruby version: 2.5.1
+### Development
+* macOS version 10.13.5 (High Sierra).
 
-* System dependencies
+### Deployment
+* Not prepared yet.
 
-* Configuration: default
+## Run Development Server
+```
+$ rails server
+```
 
-* Database creation: none(sqlite3)
+## Test
 
-* Database initialization: none(sqlite3)
+```
+$ rspec [spec file path - optional]
+```
 
-* How to run the test suite: $ rspec spec/
+## Deploy
 
-* Services (job queues, cache servers, search engines, etc.): none
+### Database
+Temporarily using sqlite3 (this project is not production-ready)
 
-* Deployment instructions: $ rails server
+### Web Server
+```
+$ rails server
+```
