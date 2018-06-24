@@ -6,22 +6,18 @@ RSpec.describe Movie, type: :model do
   before { @movie = FactoryBot.build(:movie) }
   subject { @movie }
 
-  it { is_expected.to respond_to(:name) }
-  it { is_expected.to respond_to(:code) }
+  it { is_expected.to respond_to(:title) }
+  it { is_expected.to respond_to(:kmdb_seq) }
   it { is_expected.to respond_to(:director) }
-  it { is_expected.to respond_to(:open_year) }
+  it { is_expected.to respond_to(:release_date) }
   it { is_expected.to respond_to(:production_year) }
 
-  it { is_expected.to validate_presence_of :name }
-  it { is_expected.to validate_presence_of :code }
+  it { is_expected.to validate_presence_of :title }
+  it { is_expected.to validate_presence_of :kmdb_seq }
   it { is_expected.to validate_presence_of :director }
-  it {
-    is_expected.to(
-      validate_numericality_of(
-        :open_year
-      ).is_greater_than_or_equal_to(1896)
-    )
-  }
+  it { is_expected.to validate_presence_of :release_date }
+  # TODO: validate that release_date is valid date
+  # it { is_expected.to validates_date :release_date }
   it {
     is_expected.to(
       validate_numericality_of(

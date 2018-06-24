@@ -3,6 +3,9 @@
 # Serialize movie model
 class MovieSerializer
   include FastJsonapi::ObjectSerializer
-  attributes :name, :code, :director, :open_year, :production_year
+  attributes :title, :kmdb_seq, :director, :nation, :production_year
+  attribute :release_date do |object|
+    object.release_date.strftime('%Y-%m-%d')
+  end
   has_many :questions
 end

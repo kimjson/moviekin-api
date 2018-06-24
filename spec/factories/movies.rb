@@ -2,10 +2,11 @@
 
 FactoryBot.define do
   factory :movie do
-    name { FFaker::Movie.title }
-    code { FFaker::String.from_regexp(/[0-9]{8}/) }
+    title { FFaker::Movie.title }
+    kmdb_seq { FFaker::String.from_regexp(/[0-9]{5,}/) }
     director { FFaker::Name.name }
-    open_year { Random.rand(1896..9999) }
+    nation { FFaker::Address.country }
+    release_date { FFaker::Time.date }
     production_year { Random.rand(1896..9999) }
   end
 end
