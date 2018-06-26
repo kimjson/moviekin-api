@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'api_constraints'
+require 'sidekiq/web'
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
@@ -24,4 +25,5 @@ Rails.application.routes.draw do
           to: redirect('/assets/swagger-ui-dist/index.html?url=/swagger.json')
     end
   end
+  mount Sidekiq::Web => '/sidekiq'
 end

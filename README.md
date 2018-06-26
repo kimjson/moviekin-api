@@ -6,6 +6,8 @@ RoR API part of MovieKin, stackoverflow clone service for Q&A about movies.
 * Ruby on Rails (v5.2.0)
 * RSpec (v3.7)
 * Rubocop (v0.56.0)
+* Sidekiq (v5.1.3)
+* Redis (v4.1.0)
 
 ## System Environment
 

@@ -49,5 +49,6 @@ module MoviekinApi
 
     config.autoload_paths += %W(\#{config.root}/lib)
     config.assets.paths << Rails.root.join('node_modules')
+    config.active_job.queue_adapter = :sidekiq
   end
 end
