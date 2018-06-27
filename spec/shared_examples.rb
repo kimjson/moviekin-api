@@ -33,7 +33,7 @@ RSpec.shared_examples 'field validation error result' do |type|
 
   it 'renders the json errors on which field was the problem' do
     json_response[:errors].each do |error|
-      expect(error[:source][:pointer]).to match(/^\/data\/attributes\//)
+      expect(error[:source][:pointer]).to match(%r{^/data/attributes/})
       expect(error[:title]).to match(/^Invalid #{type.capitalize}$/)
     end
   end
