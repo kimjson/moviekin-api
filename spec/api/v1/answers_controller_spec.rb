@@ -17,7 +17,9 @@ RSpec.describe Api::V1::AnswersController, type: :request do
       end
 
       include_examples 'response attributes correct v2' do
-        let(:target_attributes) { @answer.as_json.symbolize_keys.extract!(:content) }
+        let(:target_attributes) do
+          @answer.as_json.symbolize_keys.extract!(:content)
+        end
       end
 
       it { expect(response).to have_http_status(200) }

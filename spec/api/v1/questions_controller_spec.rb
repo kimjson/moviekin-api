@@ -50,7 +50,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
   describe 'GET #index' do
     include_examples(
       'returns 4 records from the database',
-      'question',
+      'question'
     )
   end
 
@@ -99,7 +99,7 @@ RSpec.describe Api::V1::QuestionsController, type: :request do
           }
         }
       end
-      
+
       include_examples 'field validation error result', 'question', 'Questions'
     end
   end

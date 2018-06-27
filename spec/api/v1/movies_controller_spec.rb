@@ -32,7 +32,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       include_examples 'returns record with correct id' do
         let(:target_id) { @movie.id.to_s }
       end
-      
+
       it { expect(response).to have_http_status(200) }
     end
 
