@@ -33,7 +33,7 @@ module Api
 
       def movie_params
         movie_attributes = %i[
-          title kmdb_seq director nation release_date production_year
+          title kmdb_docid director nation release_date production_year
         ]
         params.require(:data)
               .permit(:type, :relationships, attributes: movie_attributes)

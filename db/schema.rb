@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_06_24_162322) do
+ActiveRecord::Schema.define(version: 2018_06_29_133502) do
 
   create_table "answers", force: :cascade do |t|
     t.text "content", default: ""
@@ -22,13 +22,14 @@ ActiveRecord::Schema.define(version: 2018_06_24_162322) do
 
   create_table "movies", force: :cascade do |t|
     t.string "title"
-    t.string "kmdb_seq"
+    t.string "kmdb_docid"
     t.string "director"
     t.integer "production_year"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.date "release_date"
     t.string "nation"
+    t.index ["kmdb_docid"], name: "index_movies_on_kmdb_docid", unique: true
   end
 
   create_table "questions", force: :cascade do |t|

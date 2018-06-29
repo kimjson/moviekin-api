@@ -1,4 +1,4 @@
 :schedule:
   movie_worker:
-    cron: '0 * * * * *'   # Runs once per minute
+    cron: '0 0 6 * * 5'   # Runs once per minute
     class: MovieWorker

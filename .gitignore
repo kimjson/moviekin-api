@@ -33,3 +33,4 @@ rubocop.txt
 rubocop_correct.txt
 
 .idea/
+app/workers/examples/

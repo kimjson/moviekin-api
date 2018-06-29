@@ -22,7 +22,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         let(:target_attributes) do
           @movie.as_json.symbolize_keys.extract!(
             :title,
-            :kmdb_seq,
+            :kmdb_docid,
             :director,
             :production_year
           )
@@ -73,7 +73,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       before(:each) do
         @invalid_movie_attributes = {
           title: nil,
-          kmdb_seq: 'hello',
+          kmdb_docid: 'hello',
           director: 1,
           release_date: 'hey you',
           production_year: 'bye bye',
