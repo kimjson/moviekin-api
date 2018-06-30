@@ -2,7 +2,6 @@
 
 require 'http'
 require 'time'
-require 'sidekiq-scheduler'
 # Sidekiq worker class for fetching movies
 class MovieWorker
   include Sidekiq::Worker
@@ -28,23 +27,34 @@ class MovieWorker
     end
   end
 
-  def perform
+  # releaseDts (string): (YYYYMMDD) release date start
+  # releaseDte (string): (YYYYMMDD) release date end
+  def perform(releaseDts:, releaseDte:, type: '극영화', listCount: 100)
+    puts "Start fetching #{type} movies released last week..."
+
+    # validate required parameter
+    # releaseDts, releaseDte should be valid dates.
+    # releaseDts should be before than or equal releaseDte.
+    release_date_start = Date.parse releaseDts
+    release_date_end = Date.parse releaseDte
+    raise ArgumentError unless release_date_start <= release_date_end
+
     movies = []
 
-    # change hard coded date strings.
     response = conn.get(
       '/openapi-data2/wisenut/search_api/search_json.jsp',
       'ServiceKey' => KOFA_API_KEY,
       'collection' => 'kmdb_new',
       'detail' => 'Y',
-      'releaseDts' => '20180623',
-      'releaseDte' => '20180629',
-      'type' => '극영화',
-      'listCount' => 100
+      'releaseDts' => releaseDts,
+      'releaseDte' => releaseDte,
+      'type' => type,
+      'listCount' => listCount
     )
     json = JSON.parse(response.body.gsub(',]', ']'), symbolize_names: true)
-    kmdb_movies = json[:Data][0][:Result]
-    
+    puts json
+    kmdb_movies = json[:Data][0].fetch(:Result, [])
+
     kmdb_movies.each do |kmdb_movie|
       if Movie.find_by(kmdb_docid: kmdb_movie[:DOCID]).nil?
         # creat movie object
@@ -55,11 +65,19 @@ class MovieWorker
         movie.production_year = kmdb_movie[:prodYear]
         movie.release_date = kmdb_movie[:rating][0][:releaseDate]
         movie.nation = kmdb_movie[:nation]
-        movies << movie if movie.save
+        movie.save!
+        movies << movie
       end
     end
-    puts "Fetched movies: #{kmdb_movies.length}"
-    puts "Stored movies: #{movies.length}"
-    movies
+    puts "Fetched #{type} movies: #{kmdb_movies.length}"
+    puts "Stored #{type} movies: #{movies.length}"
+    puts "Finished fetching #{type} movies."
+    {
+      count: {
+        fetched: kmdb_movies.length,
+        stored: movies.length,
+        duplicated: kmdb_movies.length - movies.length
+      }
+    }
   end
 end

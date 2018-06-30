@@ -58,7 +58,6 @@ gem 'fast_jsonapi'
 gem 'http'
 gem 'rubocop', '~> 0.56.0', require: false
 gem 'sidekiq'
-gem 'sidekiq-scheduler'
 gem 'validates_timeliness'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

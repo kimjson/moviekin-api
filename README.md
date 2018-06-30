@@ -18,8 +18,21 @@ RoR API part of MovieKin, stackoverflow clone service for Q&A about movies.
 * Not prepared yet.
 
 ## Run Development Server
+Run sidekiq.
+```sh
+sidekiq
 ```
-$ rails server
+Register cron job (Sidekiq worker).
+```sh
+$ crontab -e
+```
+Add following line if there isn't.
+```
+0 6 * * 5 rake movie_task
+```
+Run rails server.
+```sh
+rails s
 ```
 
 ## Test

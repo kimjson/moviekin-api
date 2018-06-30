@@ -3,50 +3,82 @@
 require 'rails_helper'
 
 RSpec.describe MovieWorker do
-  # describe 'Every movie object fetched stored to db' do
-  #   before(:all) do
-  #     MovieWorker.new.perform
-      
-  #   end
+  # date strings
+  let(:start_date) { '20180623' }
+  let(:start_date2) { '20180323' }
+  let(:end_date) { '20180629' }
+
+  let(:invalid_start_date) { 'hello' }
+  let(:invalid_end_date) { 'world' }
+
+  context 'Invalid arguments' do
+    it 'releaseDts missing' do
+      expect{MovieWorker.new.perform(releaseDte: end_date)}.to(
+        raise_error ArgumentError
+      )
+    end
+    it 'releaseDte missing' do
+      expect{MovieWorker.new.perform(releaseDts: start_date)}.to(
+        raise_error ArgumentError
+      )
+    end
+    it 'Invalid argument type or format' do
+      expect{MovieWorker.new.perform(
+        releaseDts: invalid_start_date,
+        releaseDte: invalid_end_date
+      )}.to(
+        raise_error ArgumentError
+      )
+    end
+    it 'Reversed date arguments order' do
+      expect{MovieWorker.new.perform(
+        releaseDts: end_date,
+        releaseDte: start_date
+      )}.to(
+        raise_error ArgumentError
+      )
+    end
+  end
+  context 'First try' do
+    it 'Store every fetched movie' do
+      result = MovieWorker.new.perform(
+        releaseDts: start_date,
+        releaseDte: end_date
+      )
+
+      expect(result[:count][:fetched]).to eq(result[:count][:stored])
+      expect(result[:count][:duplicated]).to eq(0)
+    end
+  end
+
+  # Known fact: From start_date to end_date, 6 finction movies are released.
+  # Source: KOFA(KMDB) API
+  context 'Retry: first try succeeded half-way (3 of 6 movies stored).' do
+    # total_count should be accurate(actual)!
+    # halfway_count can be fake as long as it's smaller than total_count
+    let(:total_count) { 6 }
+    let(:halfway_count) { 2 }
+    before(:each) do
+      MovieWorker.new.perform(
+        releaseDts: start_date,
+        releaseDte: end_date,
+        listCount: halfway_count
+      )
+    end
+
+    it 'Store 3 remaining movies' do
+      result = MovieWorker.new.perform(
+        releaseDts: start_date,
+        releaseDte: end_date
+      )
+
+      expect(result[:count][:fetched]).to eq(total_count)
+      expect(result[:count][:duplicated]).to eq(halfway_count)
+    end
+  end
+
+  # TODO: add tests for using type, listCount arguments.
+  # describe 'Fetch and store documentary movies' do
+  #   it {expect{}}
   # end
-
-  # TODO: duplicate test. duplicate should skip.
-  # describe 'After some of the movies failed to be stored retry to make all succeed'
-  
-  # describe 'GET #show' do
-  #   context 'when the record exists' do
-  #     before(:each) do
-  #       @movie = FactoryBot.create :movie
-  #       3.times { FactoryBot.create :question, movie: @movie }
-  #       get "/movies/#{@movie.id}"
-  #     end
-
-  #     # TODO: test release_date equality
-  #     include_examples 'response attributes correct v2' do
-  #       let(:target_attributes) do
-  #         @movie.as_json.symbolize_keys.extract!(
-  #           :title,
-  #           :kmdb_docid,
-  #           :director,
-  #           :production_year
-  #         )
-  #       end
-  #     end
-
-  #     include_examples 'returns record with correct id' do
-  #       let(:target_id) { @movie.id.to_s }
-  #     end
-
-  #     it { expect(response).to have_http_status(200) }
-  #   end
-
-  #   context 'when the record does not exist' do
-  #     before(:each) do
-  #       get '/movies/100'
-  #     end
-
-  #     include_examples 'not found', 'movie'
-  #   end
-  # end
-
 end
