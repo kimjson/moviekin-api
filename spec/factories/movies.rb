@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :movie do
     title { FFaker::Movie.title }
-    kmdb_docid { FFaker::String.from_regexp(/[0-9]{5,}/) }
+    sequence(:kmdb_docid, 10_000) { |n| "F#{n}" }
     director { FFaker::Name.name }
     nation { FFaker::Address.country }
     release_date { FFaker::Time.date }

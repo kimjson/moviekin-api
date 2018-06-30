@@ -17,9 +17,9 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         get "/movies/#{@movie.id}"
       end
 
-      # TODO: test release_date equality
       include_examples 'response attributes correct v2' do
         let(:target_attributes) do
+          puts @movie.as_json.symbolize_keys
           @movie.as_json.symbolize_keys.extract!(
             :title,
             :kmdb_docid,
@@ -27,6 +27,12 @@ RSpec.describe Api::V1::MoviesController, type: :request do
             :production_year
           )
         end
+      end
+
+      it 'release_date correct' do
+        expect(
+          Date.parse(json_response[:data][:attributes][:release_date])
+        ).to eq(@movie.release_date)
       end
 
       include_examples 'returns record with correct id' do
@@ -61,9 +67,14 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         }
       end
 
-      # TODO: test release_date equality
       include_examples 'response attributes correct v2' do
         let(:target_attributes) { @movie_attributes.except(:release_date) }
+      end
+
+      it 'release_date correct' do
+        expect(
+          Date.parse(json_response[:data][:attributes][:release_date])
+        ).to eq(Date.parse(@movie_attributes[:release_date]))
       end
 
       it { expect(response).to have_http_status(201) }

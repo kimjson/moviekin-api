@@ -27,48 +27,37 @@ class MovieWorker
     end
   end
 
-  # releaseDts (string): (YYYYMMDD) release date start
-  # releaseDte (string): (YYYYMMDD) release date end
-  def perform(releaseDts:, releaseDte:, type: '극영화', listCount: 100)
-    puts "Start fetching #{type} movies released last week..."
-
-    # validate required parameter
-    # releaseDts, releaseDte should be valid dates.
-    # releaseDts should be before than or equal releaseDte.
-    release_date_start = Date.parse releaseDts
-    release_date_end = Date.parse releaseDte
-    raise ArgumentError unless release_date_start <= release_date_end
-
-    movies = []
-
-    response = conn.get(
+  def fetch_movies(start_date, end_date, type, list_count)
+    JSON.parse(correct_json(conn.get(
       '/openapi-data2/wisenut/search_api/search_json.jsp',
       'ServiceKey' => KOFA_API_KEY,
       'collection' => 'kmdb_new',
       'detail' => 'Y',
-      'releaseDts' => releaseDts,
-      'releaseDte' => releaseDte,
+      'releaseDts' => start_date,
+      'releaseDte' => end_date,
       'type' => type,
-      'listCount' => listCount
-    )
-    json = JSON.parse(response.body.gsub(',]', ']'), symbolize_names: true)
-    puts json
-    kmdb_movies = json[:Data][0].fetch(:Result, [])
+      'listCount' => list_count
+    ).body), symbolize_names: true)[:Data][0].fetch(:Result, [])
+  end
 
-    kmdb_movies.each do |kmdb_movie|
-      if Movie.find_by(kmdb_docid: kmdb_movie[:DOCID]).nil?
-        # creat movie object
-        movie = Movie.new
-        movie.title = kmdb_movie[:title]
-        movie.kmdb_docid = kmdb_movie[:DOCID]
-        movie.director = kmdb_movie[:director][0][:directorNm]
-        movie.production_year = kmdb_movie[:prodYear]
-        movie.release_date = kmdb_movie[:rating][0][:releaseDate]
-        movie.nation = kmdb_movie[:nation]
-        movie.save!
-        movies << movie
-      end
-    end
+  def correct_json(json)
+    json.gsub(',]', ']')
+        .gsub('}{', '},{')
+  end
+
+  def create_movie_from_kmdb(kmdb_movie)
+    movie = Movie.new
+    movie.title = kmdb_movie[:title]
+    movie.kmdb_docid = kmdb_movie[:DOCID]
+    movie.director = kmdb_movie[:director][0][:directorNm]
+    movie.production_year = kmdb_movie[:prodYear]
+    movie.release_date = kmdb_movie[:rating][0][:releaseDate]
+    movie.nation = kmdb_movie[:nation]
+    movie.save!
+    movie
+  end
+
+  def perform_result(type, kmdb_movies, movies)
     puts "Fetched #{type} movies: #{kmdb_movies.length}"
     puts "Stored #{type} movies: #{movies.length}"
     puts "Finished fetching #{type} movies."
@@ -79,5 +68,22 @@ class MovieWorker
         duplicated: kmdb_movies.length - movies.length
       }
     }
+  end
+
+  # start_date (string): (YYYYMMDD) release date start
+  # end_date (string): (YYYYMMDD) release date end
+  def perform(start_date:, end_date:, type: '극영화', list_count: 100)
+    puts "Start fetching #{type} movies released last week..."
+    # validate required parameter
+    # start_date, end_date should be valid dates(check this by try parsing).
+    # start_date should be before than or equal end_date.
+    raise ArgumentError unless Date.parse(start_date) <= Date.parse(end_date)
+    movies = []
+    kmdb_movies = fetch_movies(start_date, end_date, type, list_count)
+    kmdb_movies.each do |kmdb_movie|
+      next unless Movie.find_by(kmdb_docid: kmdb_movie[:DOCID]).nil?
+      movies << create_movie_from_kmdb(kmdb_movie)
+    end
+    perform_result type, kmdb_movies, movies
   end
 end

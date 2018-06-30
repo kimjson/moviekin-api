@@ -2,16 +2,16 @@
 
 desc 'Fetch movies from KOFA api and save them on db'
 task movie_task: :environment do
-  releaseDts = Date.today.prev_day(7).strftime('%Y%m%d')
-  releaseDte =  Date.today.strftime('%Y%m%d')
+  start_date = Date.today.prev_day(7).strftime('%Y%m%d')
+  end_date = Date.today.strftime('%Y%m%d')
 
   # Fetch and store fiction movies released last week
-  MovieWorker.perform_async(releaseDts: releaseDts, releaseDte: releaseDte)
+  MovieWorker.perform_async(start_date: start_date, end_date: end_date)
 
   # Fetch and store documentary movies released last week
   MovieWorker.perform_async(
-    releaseDts: releaseDts,
-    releaseDte: releaseDte,
+    start_date: start_date,
+    end_date: end_date,
     type: '다큐멘터리'
   )
 
