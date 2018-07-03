@@ -19,20 +19,26 @@ RSpec.describe Api::V1::MoviesController, type: :request do
 
       include_examples 'response attributes correct v2' do
         let(:target_attributes) do
+          puts @movie.as_json.symbolize_keys
           @movie.as_json.symbolize_keys.extract!(
-            :name,
-            :code,
+            :title,
+            :kmdb_docid,
             :director,
-            :open_year,
             :production_year
           )
         end
       end
 
+      it 'release_date correct' do
+        expect(
+          Date.parse(json_response[:data][:attributes][:release_date])
+        ).to eq(@movie.release_date)
+      end
+
       include_examples 'returns record with correct id' do
         let(:target_id) { @movie.id.to_s }
       end
-      
+
       it { expect(response).to have_http_status(200) }
     end
 
@@ -62,7 +68,13 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       end
 
       include_examples 'response attributes correct v2' do
-        let(:target_attributes) { @movie_attributes }
+        let(:target_attributes) { @movie_attributes.except(:release_date) }
+      end
+
+      it 'release_date correct' do
+        expect(
+          Date.parse(json_response[:data][:attributes][:release_date])
+        ).to eq(Date.parse(@movie_attributes[:release_date]))
       end
 
       it { expect(response).to have_http_status(201) }
@@ -71,11 +83,12 @@ RSpec.describe Api::V1::MoviesController, type: :request do
     context 'field validation error' do
       before(:each) do
         @invalid_movie_attributes = {
-          name: nil,
-          code: 'hello',
+          title: nil,
+          kmdb_docid: 'hello',
           director: 1,
-          open_year: 'hey you',
-          production_year: 'bye bye'
+          release_date: 'hey you',
+          production_year: 'bye bye',
+          nation: nil
         }
         post '/movies', params: {
           data: {
@@ -110,7 +123,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
       end
 
       include_examples 'response attributes correct v2' do
-        let(:target_attributes) { @new_movie_attributes }
+        let(:target_attributes) { @new_movie_attributes.except(:release_date) }
       end
 
       it { expect(response).to have_http_status(200) }
@@ -134,7 +147,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         patch "/movies/#{@movie.id}", params: {
           data: {
             type: 'movie',
-            attributes: { name: nil }
+            attributes: { title: nil }
           }
         }
       end

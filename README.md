@@ -6,6 +6,8 @@ RoR API part of MovieKin, stackoverflow clone service for Q&A about movies.
 * Ruby on Rails (v5.2.0)
 * RSpec (v3.7)
 * Rubocop (v0.56.0)
+* Sidekiq (v5.1.3)
+* Redis (v4.1.0)
 
 ## System Environment
 
@@ -16,8 +18,21 @@ RoR API part of MovieKin, stackoverflow clone service for Q&A about movies.
 * Not prepared yet.
 
 ## Run Development Server
+Run sidekiq.
+```sh
+sidekiq
 ```
-$ rails server
+Register cron job (Sidekiq worker).
+```sh
+$ crontab -e
+```
+Add following line if there isn't.
+```
+0 6 * * 5 rake movie_task
+```
+Run rails server.
+```sh
+rails s
 ```
 
 ## Test
