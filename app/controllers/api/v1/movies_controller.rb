@@ -4,29 +4,27 @@ module Api
   module V1
     # CRUD controller for movie model.
     class MoviesController < ApplicationController
-      before_action :setup
       def setup
-        @json_response = JsonResponse.new(MovieSerializer)
+        @serializer = MovieSerializer
       end
 
       def show
-        @json_response.send params: params, data: Movie.find(params[:id])
+        json_response data: Movie.find(params[:id]), options: params
       end
 
       def index
-        @json_response.send data: Movie.all
+        json_response data: Movie.all
       end
 
       def create
-        Rails.logger.debug "movie_params: #{movie_params}"
         movie = Movie.create!(movie_params)
-        @json_response.send data: movie, status: 201, location: [:api, movie]
+        json_response data: movie, status: 201, location: [:api, movie]
       end
 
       def update
         movie = Movie.find(params[:id])
         movie.update!(movie_params)
-        @json_response.send data: movie, status: 200, location: [:api, movie]
+        json_response data: movie, status: 200, location: [:api, movie]
       end
 
       def destroy
