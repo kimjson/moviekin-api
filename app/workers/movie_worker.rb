@@ -58,15 +58,14 @@ class MovieWorker
   end
 
   def perform_result(type, kmdb_movies, movies)
-    puts "Fetched #{type} movies: #{kmdb_movies.length}"
-    puts "Stored #{type} movies: #{movies.length}"
     puts "Finished fetching #{type} movies."
     {
       count: {
         fetched: kmdb_movies.length,
         stored: movies.length,
         duplicated: kmdb_movies.length - movies.length
-      }
+      },
+      data: movies
     }
   end
 

@@ -57,27 +57,33 @@ RSpec.describe MovieWorker do
 
   # Known fact: From start_date to end_date, 6 finction movies are released.
   # Source: KOFA(KMDB) API
-  context 'Retry: first try succeeded half-way (3 of 6 movies stored).' do
+  context 'Retry: first try succeeded half-way (2 of movies stored).' do
     # total_count should be accurate(actual)!
     # halfway_count can be fake as long as it's smaller than total_count
-    let(:total_count) { 6 }
-    let(:halfway_count) { 2 }
     before(:each) do
+      Movie.destroy_all
+      @halfway_count = 2
+      movies = MovieWorker.new.perform(
+        start_date: start_date,
+        end_date: end_date
+      )[:data]
+      @total_count = movies.length
+      movies.each(&:destroy)
       MovieWorker.new.perform(
         start_date: start_date,
         end_date: end_date,
-        list_count: halfway_count
+        list_count: @halfway_count
       )
     end
 
-    it 'Store 3 remaining movies' do
+    it 'Store remaining movies' do
       result = MovieWorker.new.perform(
         start_date: start_date,
         end_date: end_date
       )
 
-      expect(result[:count][:fetched]).to eq(total_count)
-      expect(result[:count][:duplicated]).to eq(halfway_count)
+      expect(result[:count][:fetched]).to eq(@total_count)
+      expect(result[:count][:duplicated]).to eq(@halfway_count)
     end
   end
 
@@ -89,8 +95,9 @@ RSpec.describe MovieWorker do
         end_date: end_date,
         type: '다큐멘터리'
       )
-      expect(result[:count][:fetched]).to eq(total_count)
-      expect(result[:count][:stored]).to eq(total_count)
+      movies = result[:data]
+      expect(result[:count][:fetched]).to eq(movies.length)
+      expect(result[:count][:stored]).to eq(movies.length)
       expect(result[:count][:duplicated]).to eq(0)
     end
   end

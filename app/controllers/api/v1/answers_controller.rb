@@ -4,6 +4,10 @@ module Api
   module V1
     # CRUD controller for answer model.
     class AnswersController < ApplicationController
+      def setup
+        @serializer = AnswerSerializer
+      end
+
       def show
         json_response data: Answer.find(params[:id])
       end

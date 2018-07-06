@@ -19,7 +19,6 @@ RSpec.describe Api::V1::MoviesController, type: :request do
 
       include_examples 'response attributes correct v2' do
         let(:target_attributes) do
-          puts @movie.as_json.symbolize_keys
           @movie.as_json.symbolize_keys.extract!(
             :title,
             :kmdb_docid,

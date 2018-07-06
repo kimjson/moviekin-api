@@ -4,6 +4,10 @@ module Api
   module V1
     # CRUD controller for movie model.
     class MoviesController < ApplicationController
+      def setup
+        @serializer = MovieSerializer
+      end
+
       def show
         json_response data: Movie.find(params[:id]), options: params
       end
@@ -13,7 +17,6 @@ module Api
       end
 
       def create
-        Rails.logger.debug "movie_params: #{movie_params}"
         movie = Movie.create!(movie_params)
         json_response data: movie, status: 201, location: [:api, movie]
       end
